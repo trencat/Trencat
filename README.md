@@ -28,7 +28,8 @@ This section will be filled in the future.
 
 In Windows, open a console in the source folder:
 
-```::Install virtualenv if you don't have it yet
+```
+:: Install virtualenv if you don't have it yet
 pip install virtualenv
 
 :: Create a virtualenv just for documentation libraries
@@ -47,7 +48,8 @@ sphinx-build -b html source build\\html
 
 In Linux, open the command line in the source folder
 
-```#Install pip if you don't have it yet
+```
+# Install pip if you don't have it yet
 sudo apt install python3-pip
 
 # Install virtualenv if you don't have it yet

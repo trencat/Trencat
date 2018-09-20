@@ -1,6 +1,6 @@
 # Contributing
 
-It's nice to have you here! You can contribute in *Trencat* project in many ways.
+It's nice to have you here! You can contribute in *TrenCAT* project in many ways.
 1. As a software developer, you may contribute by improving platform design, implementation and documentation.
 2. As a graphic designer, you may contribute in SCADA's graphic user interface and even in the public image of the brand.
 3. As an engineer, mathematician, scientist or just motivated user, you may contribute by implementing new algorithms in **Optimal Layout Design**, **Optimal Train Scheduling**, **Real Time Automatic Train Operation** and **Passenger Demand**.
@@ -28,7 +28,7 @@ In any case, please note we have a code of conduct, please follow it in all your
 
 1. Please contact the owners and express your intention to contribute on new module implementations.
 2. Fork the repository on GitHub.
-3. Implement your magic. Concrete module's documentation should give you enough information to know how to integrate your implementation with *Trencat* platform. If you don't know how to integrate your software with *Trencat*, please contact the owners via a GitHub issue and we'll kindly help you.
+3. Implement your magic. Concrete module's documentation should give you enough information to know how to integrate your implementation with *TrenCAT* platform. If you don't know how to integrate your software with *TrenCAT*, please contact the owners via a GitHub issue and we'll kindly help you.
 4. Write native language tests to make sure that your implementation is stable and resilient. Make sure your software passes them.
 5. Write accurate and comprehensive documentation with the algorithms that you used. Also document your code accurately with language native documentation tools. For instance, check native `Godoc <https://blog.golang.org/godoc-documenting-go-code>`_ documentation tool for `Golang <https://golang.org/>`_ and `python docstring <https://www.python.org/dev/peps/pep-0257/>`_ for `Python <https://www.python.org/>`_. Make sure that your name (either real or fake) appears in documentation to make clear who wrote it.
 5. Send a GitHub Pull Request to the master branch. The changes will then be reviewed by the owners and finally accepted and merged.
@@ -47,7 +47,7 @@ Finally, if you are interested in translating documentation, you may want to fol
 
 1. Please first announce your intention to translate documentation to a different language via a GitHub issue.
 2. Fork the repository on GitHub.
-3. *Trencat* documentation is written in Sphinx, which already supports easy language internationalization. Please follow these [steps](http://www.sphinx-doc.org/en/master/intl.html) to generate the *.po* and *.mo* translation files.
+3. *TrenCAT* documentation is written in Sphinx, which already supports easy language internationalization. Please follow these [steps](http://www.sphinx-doc.org/en/master/intl.html) to generate the *.po* and *.mo* translation files.
 4. Translate documentation in your preferred language.
 5. Send a GitHub Pull Request to the master branch. The changes will then be reviewed by the owners and finally accepted and merged.
 
