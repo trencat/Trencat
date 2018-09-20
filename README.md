@@ -1,8 +1,8 @@
-# Trencat
+# TrenCAT
 
-*Trencat* is a train simulator platform prepared for any student who wants to put into practice his/her own research in Train Automation Technologies. Trencat allows users to test custom implementations in Optimal Railway Layout Design, Optimal Train Scheduling, Optimal Rolling Stock Planning, Real Time Unattended Train Operation and Passenger Demand modelisation. For more information about this subjects, read the docs.
+*TrenCAT* is a train simulator platform prepared for any student who wants to put into practice his/her own research in Train Automation Technologies. *Trencat* allows users to test custom implementations in **Optimal Railway Layout Design**, **Optimal Train Scheduling**, **Optimal Rolling Stock Planning**, **Real Time Unattended Train Operation** and **Passenger Demand modelisation**.
 
-Currently *Trencat* is being designed and no implementation has yet started.
+Currently *TrenCAT* is being designed and no implementation has yet started.
 
 ## Getting Started
 
@@ -10,7 +10,7 @@ This section will be filled in the future.
 
 ### Prerequisites
 
-This section will be filled in the future.
+This project is based in Python 3.6.
 
 ### Installing
 
@@ -23,6 +23,49 @@ Explain how to run the automated tests for this system
 ## Deployment
 
 This section will be filled in the future.
+
+## Compile documentation
+
+In Windows, open a console in the source folder:
+
+```::Install virtualenv if you don't have it yet
+pip install virtualenv
+
+:: Create a virtualenv just for documentation libraries
+virtualenv virtualenv_doc
+
+:: Activate it
+virtualenv_doc\\Scripts\\activate.bat
+
+:: Install Sphinx and dependencies
+pip install -r doc\\requirements.txt
+
+:: Build html documentation in doc\\build\\html
+cd doc
+sphinx-build -b html source build\\html
+```
+
+In Linux, open the command line in the source folder
+
+```#Install pip if you don't have it yet
+sudo apt install python3-pip
+
+# Install virtualenv if you don't have it yet
+sudo pip3 install virtualenv
+
+# Create a virtualenv just for documentation libraries
+virtualenv virtualenv_doc
+
+# Activate it
+source virtualenv_doc/bin/activate
+
+# Install Sphinx and dependencies
+pip install -r doc/requirements.txt
+
+# Build html documentation in doc/build/html
+cd doc
+sphinx-build -b html source build/html
+```
 
 ## Contributing
 
