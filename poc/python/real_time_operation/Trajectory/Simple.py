@@ -4,6 +4,7 @@ import math
 import operator
 import pyscipopt as opt
 from contextlib import suppress
+from itertools import accumulate
 from functools import reduce, lru_cache
 from .Piecewise import Piece, Piecewise
 from .Matrix import Matrix
@@ -170,12 +171,12 @@ class Simple:
     @lru_cache()
     def A(self, k):
         return Matrix([[self.a(k), 0],
-                       [self.track.length[k] * (self.f(k)[2].a + self.a(k) * self.f(k+1)[2].a), 1]])
+                       [self.track.length[k] * (self.f(k)[2].a + self.a(k) * self.f(k + 1)[2].a), 1]])
 
     @lru_cache()
     def B(self, k):
         return Matrix([[self.b(k)],
-                       [self.track.length[k] * self.f(k+1)[2].a * self.b(k)]])
+                       [self.track.length[k] * self.f(k + 1)[2].a * self.b(k)]])
 
     @lru_cache()
     def C1(self, k):
@@ -212,7 +213,7 @@ class Simple:
         """Matrix multiplying delta variables."""
         fk = self.f(k)
         # Constraint 1
-        R1 = Matrix([[-1, 1, 0], [-1, 0, 1], [1, 1, -1]])
+        R1 = Matrix([[-1, 0, 1], [0, -1, 1], [1, 1, -1]])
 
         # Constraint 2.1 & 2.2
         R1 |= (-1) * Matrix.diag([0] * 3)
@@ -375,7 +376,6 @@ class Simple:
         # Ending conditions
         block = self.A(self.N-1) * self.X(self.N-1) + self.B(self.N-1) * traction[self.N-1][0] + self.C1(self.N-1) * d[self.N-1] + self.D1(self.N-1) * z[self.N-1] + self.e(self.N-1)
         model.addCons(self.Eend == block[0][0])
-        model.addCons(self.start_time + self.timespan <= block[1][0])
         model.addCons(block[1][0] == self.start_time + self.timespan + delay)
 
     @property
@@ -399,6 +399,7 @@ class Simple:
         sol['kinetic_energy'] = [self.X(k, sol)[0][0] for k in range(self.N + 1)]
         sol['time'] = [self.X(k, sol)[1][0] for k in range(self.N + 1)]
         sol['velocity'] = [math.sqrt(2 * E) for E in sol['kinetic_energy']]
+        sol['position'] = [0] + list(accumulate((tt - t)*v for t, tt, v in zip(sol['time'], sol['time'][1:], sol['velocity'][1:])))
 
         return sol
 
