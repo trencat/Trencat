@@ -7,7 +7,7 @@ from .Piecewise import Piece, Piecewise
 from .Matrix import Matrix
 
 
-def sumi(iterable):
+def summation(iterable):
     """Sum of all elements in an iterable object."""
     return reduce(operator.add, iterable)
 
@@ -187,16 +187,16 @@ class Simple:
         R1 = Matrix([[-1, 1, 0], [-1, 0, 1], [1, 1, -1]])
 
         # Constraint 2.1 & 2.2
-        R1 |= (-1) * Matrix.Diag([0] * 3)
-        R1 |= Matrix.Diag([fk[0].domain[0] - fk[i].domain[1] for i in range(3)])
+        R1 |= (-1) * Matrix.diag([0] * 3)
+        R1 |= Matrix.diag([fk[0].domain[0] - fk[i].domain[1] for i in range(3)])
 
         # Constraint 2.3 & 2.4
-        R1 |= (-1) * Matrix.Diag([fk[0].domain[0] - fk[i].domain[1] for i in range(3)])
-        R1 |= Matrix.Diag([0] * 3)
+        R1 |= (-1) * Matrix.diag([fk[0].domain[0] - fk[i].domain[1] for i in range(3)])
+        R1 |= Matrix.diag([0] * 3)
 
         # Constraint 3.1 & 3.2
-        R1 |= Matrix.Diag([0] * 3)
-        R1 |= Matrix.Diag([fk[0].domain[0] - fk[i].domain[1] - self.eps for i in range(2)] + [0])
+        R1 |= Matrix.diag([0] * 3)
+        R1 |= Matrix.diag([fk[0].domain[0] - fk[i].domain[1] - self.eps for i in range(2)] + [0])
 
         return R1
 
@@ -205,17 +205,17 @@ class Simple:
         """Matrix multiplying z variables."""
 
         # Constraint 1
-        R3 = Matrix.Zeros(3, 3)
+        R3 = Matrix.zeros(3, 3)
 
         # Constraint 2.1 & 2.2
-        R3 |= Matrix.Id(3)
-        R3 |= (-1) * Matrix.Id(3)
+        R3 |= Matrix.id(3)
+        R3 |= (-1) * Matrix.id(3)
 
         # Constraint 2.3 & 2.4
-        R3 |= (Matrix.Id(3) | (-1) * Matrix.Id(3))
+        R3 |= (Matrix.id(3) | (-1) * Matrix.id(3))
 
         # Constraint 3.1 & 3.2
-        R3 |= (Matrix.Zeros(3, 3) | Matrix.Zeros(3, 3))
+        R3 |= (Matrix.zeros(3, 3) | Matrix.zeros(3, 3))
 
         return R3
 
@@ -224,16 +224,16 @@ class Simple:
         """Matrix multiplying u variables."""
 
         # Constraint 1
-        R5 = Matrix.Zeros(3, 1)
+        R5 = Matrix.zeros(3, 1)
 
         # Constraint 2.1 & 2.2
-        R5 |= (Matrix.Zeros(3, 1) | Matrix.Zeros(3, 1))
+        R5 |= (Matrix.zeros(3, 1) | Matrix.zeros(3, 1))
 
         # Constraint 2.3 & 2.4
-        R5 |= (Matrix.Zeros(3, 1) | Matrix.Zeros(3, 1))
+        R5 |= (Matrix.zeros(3, 1) | Matrix.zeros(3, 1))
 
         # Constraint 3.1 & 3.2
-        R5 |= (Matrix.Zeros(3, 1) | Matrix.Zeros(3, 1))
+        R5 |= (Matrix.zeros(3, 1) | Matrix.zeros(3, 1))
 
         return R5
 
@@ -242,10 +242,10 @@ class Simple:
         """Matrix multiplying X."""
 
         # Constraint 1
-        R6 = Matrix.Zeros(3, 2)
+        R6 = Matrix.zeros(3, 2)
 
         # Constraint 2.1 & 2.2
-        R6 |= (Matrix.Zeros(3, 2) | Matrix.Zeros(3, 2))
+        R6 |= (Matrix.zeros(3, 2) | Matrix.zeros(3, 2))
 
         # Constraint 2.3 & 2.4
         R6 |= Matrix([[-1, 0], [-1, 0], [-1, 0]])
@@ -265,7 +265,7 @@ class Simple:
         R7 = Matrix([[0], [0], [1]])
 
         # Constraint 2.1 & 2.2
-        R7 |= (Matrix.Zeros(3, 1) | Matrix.Zeros(3, 1))
+        R7 |= (Matrix.zeros(3, 1) | Matrix.zeros(3, 1))
 
         # Constraint 2.3 & 2.4
         R7 |= (-1) * Matrix([[fk[0].domain[0] - fk[i].domain[1] + fk[i].domain[1]] for i in range(3)])
@@ -289,19 +289,19 @@ class Simple:
         else:
             d, z, traction = self.vars['d'], self.vars['z'], self.vars['traction']
 
-        term1 = prod([self.A(j) for j in range(k)]) * Matrix([[self.Estart], [self.start_time]])
-        term2 = sumi([prod([self.A(j) for j in range(i+1, k)]) * self.B(i) * traction[i][0] for i in range(k)])
-        term3 = prod([self.A(j) for j in range(1, k)]) * self.C1(0) * d[0]
+        term1 = prod(self.A(j) for j in range(k)) * Matrix([[self.Estart], [self.start_time]])
+        term2 = summation(prod(self.A(j) for j in range(i + 1, k)) * self.B(i) * traction[i][0] for i in range(k))
+        term3 = prod(self.A(j) for j in range(1, k)) * self.C1(0) * d[0]
         if k == 1:
-            term4, term7 = Matrix.Zeros(2, 1), Matrix.Zeros(2, 1)
+            term4, term7 = Matrix.zeros(2, 1), Matrix.zeros(2, 1)
         else:
-            term4 = sumi([prod([self.A(j) for j in range(i+1, k)]) * (self.A(i) * self.C2(i-1) + self.C1(i)) * d[i] for i in range(1, k)])
-            term7 = sumi([prod([self.A(j) for j in range(i+1, k)]) * (self.A(i) * self.D2(i-1) + self.D1(i)) * z[i] for i in range(1, k)])
+            term4 = summation(prod(self.A(j) for j in range(i + 1, k)) * (self.A(i) * self.C2(i - 1) + self.C1(i)) * d[i] for i in range(1, k))
+            term7 = summation(prod(self.A(j) for j in range(i + 1, k)) * (self.A(i) * self.D2(i - 1) + self.D1(i)) * z[i] for i in range(1, k))
         term5 = self.C2(k-1) * d[k]
-        term6 = prod([self.A(j) for j in range(1, k)]) * self.D1(0) * z[0]
+        term6 = prod(self.A(j) for j in range(1, k)) * self.D1(0) * z[0]
 
         term8 = self.D2(k-1) * z[k]
-        term9 = sumi([prod([self.A(j) for j in range(i+1, k)]) * self.e(i) for i in range(k)])
+        term9 = summation(prod(self.A(j) for j in range(i + 1, k)) * self.e(i) for i in range(k))
 
         return term1 + term2 + term3 + term4 + term5 + term6 + term7 + term8 + term9
 
@@ -319,8 +319,8 @@ class Simple:
 
         # Objective function
         model.setObjective(
-            sumi([traction[k][0] * self.track.length[k] for k in range(self.N)]) +
-            sumi([self.smooth_factor * w[k][0] for k in range(self.N-1)]) +
+            sum(traction[k][0] * self.track.length[k] for k in range(self.N)) +
+            sum(self.smooth_factor * w[k][0] for k in range(self.N-1)) +
             self.punctuality_factor * delay)
 
         # Constraints

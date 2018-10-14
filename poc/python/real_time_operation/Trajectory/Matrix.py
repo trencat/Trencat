@@ -108,21 +108,21 @@ class Matrix:
         m1_rows, m1_cols, m2_cols = range(m1.rows), range(m1.cols), range(m2.cols)
         return Matrix([[sum([m1[i][k] * m2[k][j] for k in m1_cols]) for j in m2_cols] for i in m1_rows])
 
-    # TODO: zeros, id, diag instead of Zeros, Id, Diag
+    # TODO: zeros, id, diag instead of zeros, id, diag
 
     # Utilities
     @staticmethod
-    def Zeros(rows, cols):
+    def zeros(rows, cols):
         """Define a zero matrix with the specified dimensions"""
         return Matrix([[0 for j in range(cols)] for i in range(rows)])
 
     @staticmethod
-    def Id(size):
+    def id(size):
         """Define the identity matrix with the specified dimensions"""
         return Matrix([[1 if i == j else 0 for j in range(size)] for i in range(size)])
 
     @staticmethod
-    def Diag(iterable):
+    def diag(iterable):
         """Create a diagonal matrix with the given iterable"""
         return Matrix([[iterable[i] if i == j else 0 for j in range(len(iterable))] for i in range(len(iterable))])
 
