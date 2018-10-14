@@ -1,3 +1,5 @@
+"""TODO"""
+
 import math
 import operator
 import pyscipopt as opt
@@ -104,7 +106,7 @@ class Simple:
 
     @lru_cache()
     def line_resistance(self, k):
-        """TODO"""
+        """Get the line resistance parameters needed for the optimization model"""
         segment = self.track[k]
         return ((self.train.slope_resistance(segment) + self.train.curve_resistance(segment))/self.train.mass,
                 self.train.tunnel_resistance(segment, velocity=1)/self.train.mass)
@@ -221,7 +223,7 @@ class Simple:
 
     @lru_cache()
     def R5(self):
-        """Matrix multiplying u variables."""
+        """Matrix multiplying traction variables."""
 
         # Constraint 1
         R5 = Matrix.zeros(3, 1)
@@ -306,6 +308,7 @@ class Simple:
         return term1 + term2 + term3 + term4 + term5 + term6 + term7 + term8 + term9
 
     def build_model(self):
+        """TODO"""
         self.model = model = opt.Model("optimal_trajectory_single_train")
 
         # Variables
@@ -345,6 +348,7 @@ class Simple:
         model.addCons(block[1][0] == self.start_time + self.timespan + delay)
 
     def solve(self):
+        """TODO"""
         self.prepare_parameters()
         self.build_model()
         self.print_model()  # TODO: Only in debug mode
@@ -368,6 +372,7 @@ class Simple:
         return sol
 
     def print_model(self):
+        """TODO"""
         with open('debug_cons.log', 'w') as f:
             for cons in self.constraints:
                 f.write(str(cons.expr) + " <= " + str(cons.rhs) + '\n')
