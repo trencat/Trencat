@@ -20,7 +20,7 @@ class Track:
                 tunnel (:obj:`tunnel` or :obj:`list` of bool): Boolean tuple indicating if each segment track runs in a
                 tunnel or not.
         """
-        if len(length) == len(max_speed) == len(slope) == len(bend_radius) == len(tunnel):
+        if not len(length) == len(max_speed) == len(slope) == len(bend_radius) == len(tunnel):
             raise ValueError('All tuples must have the same length.')
 
         self.length = length
