@@ -19,12 +19,42 @@ def prod(iterable):
     return reduce(operator.mul, iterable, 1)
 
 
+# TODO: Find a better class name
 class Simple:
-    """TODO"""
+    """Optimal Trajectory Planner for a Single Train.
 
-    def __init__(self, train, track, timespan, end_velocity, smooth_factor, punctuality_factor, start_time=0,
-                 start_velocity=None):
-        """TODO"""
+    This class computes the optimal trajectory of a train using optimization reserach. It is based on [WNBS]_ (see
+    documentation),
+
+        Wang, B. Ning, T. v. d. Boom and B. D. Schutter,
+        Optimal Trajectory Planning and Train Scheduling for Urban Rail Transit Systems,
+        Springer International Publishing, 2016.
+
+    This implementation assumes that the maximum traction force of the train is constant, i.e., it doesn't depend on
+    current velocity. In addition, it also implements extra functionality to fit custom needs:
+        - In the original problem, if the time span (T) is too low, the problem becomes infeasible. Here, an extra
+        variable (S) is added to account the positive deviation (T + S) from the desired time span. If the train cannot
+        make it within T seconds, it will take T + S seconds, with S as small as possible.
+    """
+
+    def __init__(self, train, track, timespan, end_velocity, smooth_factor, punctuality_factor, start_velocity=None,
+                 start_time=0):
+        """Initialise trajectory planner
+
+            Args:
+                train (:obj:`Train`): Train instance.
+                track (:obj:`Track`): Track instance.
+                timespan (float): Time in seconds that the train must take to complete the given track.
+                end_velocity (float): The velocity that the train must have at the end of the given track.
+                smooth_factor (float): Jerk rate.
+                punctuality_factor (float): Punctuality factor.
+                start_velocity (float): Train velocity at the beginning of the track. If None, the current train
+                velocity will be used.
+                start_time (float): Number of seconds indicating the time when the train starts running. You shouldn't
+                modify this parameter unless you have a compelling reason.
+
+
+        """
         self.train = train
         self.track = track
         self.timespan = timespan
@@ -62,12 +92,16 @@ class Simple:
         self.piecewise_approximation = self.compute_piecewise_approximation(self.Estart, self.track.max_speed)
 
     # @staticmethod
-    def compute_piecewise_approximation(self, Estart, max_speed):
-        """TODO"""
-        # TODO: Implement piecewise affine approximation computations based on max_speed
-        # TODO Make this method static when implemented
+    def compute_piecewise_approximation(self, min_speed, max_speed):
+        """Computes piecewise affine approximation of f(x) = 0.5 / sqrt(2 * x) for different maximum velocities.
 
-        piecewise_approximation = {
+            Args:
+                min_speed (float): Minimum train speed.
+                max_speed (:obj:`tuple` or :obj:`list` of float): Maximum velocity at each segment track.
+        """
+        # TODO: Implement piecewise affine approximation computations based on max_speed. Then, make this method static
+
+        return {
             'init': Piecewise((Piece(a=-4.6463e-4, b=0.0734, domain=(self.Estart, 80.8)),
                                Piece(a=-4.6463e-4, b=0.0734, domain=(80.8, 200)),
                                Piece(a=-4.6463e-4, b=0.0734, domain=(200, 312.5)))),
@@ -91,11 +125,9 @@ class Simple:
                               Piece(a=-1.4514e-6, b=0.0235, domain=(320, 450))))
         }
 
-        return piecewise_approximation
-
     @lru_cache()
     def f(self, k):
-        """TODO"""
+        """Piecewise affine approximation of f(x) = 0.5 / sqrt(2 * x) for the k-th track segment."""
         if k == 0 and self.start_velocity <= self._min_velocity_threshold:
             return self.piecewise_approximation['init']
 
@@ -106,39 +138,33 @@ class Simple:
 
     @lru_cache()
     def line_resistance(self, k):
-        """Get the line resistance parameters needed for the optimization model"""
+        """Line resistance parameters required by the optimization model."""
         segment = self.track[k]
         return ((self.train.slope_resistance(segment) + self.train.curve_resistance(segment))/self.train.mass,
                 self.train.tunnel_resistance(segment, velocity=1)/self.train.mass)
 
     @lru_cache()
     def zeta(self):
-        """TODO"""
         return 1 / (self.train.mass * self.train.massfactor)
 
     @lru_cache()
     def eta(self, k):
-        """TODO"""
         return -2 * (self.train.basic_resistance_params[1] + self.line_resistance(k)[1]) / self.train.massfactor
 
     @lru_cache()
     def gamma(self, k):
-        """TODO"""
         return -(self.train.basic_resistance_params[0] + self.line_resistance(k)[0]) / self.train.massfactor
 
     @lru_cache()
     def a(self, k):
-        """TODO"""
         return math.exp(self.eta(k) * self.track.length[k])
 
     @lru_cache()
     def b(self, k):
-        """TODO"""
         return (self.a(k) - 1) * self.zeta() / self.eta(k)
 
     @lru_cache()
     def c(self, k):
-        """TODO"""
         return (self.a(k) - 1) * self.gamma(k) / self.eta(k)
 
     @lru_cache()
@@ -205,7 +231,6 @@ class Simple:
     @lru_cache()
     def R3(self):
         """Matrix multiplying z variables."""
-
         # Constraint 1
         R3 = Matrix.zeros(3, 3)
 
@@ -224,7 +249,6 @@ class Simple:
     @lru_cache()
     def R5(self):
         """Matrix multiplying traction variables."""
-
         # Constraint 1
         R5 = Matrix.zeros(3, 1)
 
@@ -281,8 +305,11 @@ class Simple:
 
     # @lru_cache()
     def X(self, k, solution=None):
-        """Model dynamics."""
+        """Model dynamics.
 
+        X has two components, namely the train's kinetic energy in k-th track segment and the time the train travels
+        through this segment.
+        """
         if k == 0:
             return Matrix([[self.Estart], [self.start_time]])
 
@@ -308,7 +335,11 @@ class Simple:
         return term1 + term2 + term3 + term4 + term5 + term6 + term7 + term8 + term9
 
     def build_model(self):
-        """TODO"""
+        """Build the operations research model needed to compute the optimal trajectory."""
+        # Prepare data
+        self.prepare_parameters()
+
+        # Initialize model
         self.model = model = opt.Model("optimal_trajectory_single_train")
 
         # Variables
@@ -347,13 +378,13 @@ class Simple:
         model.addCons(self.start_time + self.timespan <= block[1][0])
         model.addCons(block[1][0] == self.start_time + self.timespan + delay)
 
-    def solve(self):
-        """TODO"""
-        self.prepare_parameters()
+    @property
+    def plan(self):
+        """Obtain a trajectory plan."""
         self.build_model()
-        self.print_model()  # TODO: Only in debug mode
-        self.model.writeStatistics(filename="debug.log")  # TODO: Only in debug mode
         self.model.optimize()
+        self.print_model()  # TODO: Only in debug mode
+        self.print_statistics()  # TODO: Only in debug mode
 
         # TODO Return a nicer object
         d, z, w, traction, delay = self.vars['d'], self.vars['z'], self.vars['w'], self.vars['traction'], self.vars['delay']
@@ -371,8 +402,15 @@ class Simple:
 
         return sol
 
+    def print_statistics(self):
+        """Prints operations research model resolution statistics into a file for debugging puporses."""
+        # TODO: Filename as parameter
+        self.model.writeStatistics()
+        self.model.writeStatistics(filename="debug.log")
+
     def print_model(self):
-        """TODO"""
+        """Prints the operations research optimization model into a file for debugging purposes."""
+        # TODO: Filename as parameter
         with open('debug_cons.log', 'w') as f:
             for cons in self.constraints:
                 f.write(str(cons.expr) + " <= " + str(cons.rhs) + '\n')
