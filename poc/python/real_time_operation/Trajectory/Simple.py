@@ -377,6 +377,8 @@ class Simple:
         block = self.A(self.N-1) * self.X(self.N-1) + self.B(self.N-1) * traction[self.N-1][0] + self.C1(self.N-1) * d[self.N-1] + self.D1(self.N-1) * z[self.N-1] + self.e(self.N-1)
         model.addCons(self.Eend == block[0][0])
         model.addCons(block[1][0] == self.start_time + self.timespan + delay)
+        cons.append(self.Eend == block[0][0])
+        cons.append(block[1][0] == self.start_time + self.timespan + delay)
 
     @property
     def plan(self):
