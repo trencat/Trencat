@@ -83,7 +83,7 @@ I strongly believe in high quality open source software. This software is `licen
 
 Documentation
 =============
-The documentation that you are reading now introduces *TrenCAT* to interested users. The first part is devoted to give a concise state-of-the-art introduction to all subjects involved in train automation. The second part gives insights about how *TrenCAT* is structured with no specific programming language implementation details.
+The documentation that you are reading now introduces *TRENCAT* to interested users. The first part is devoted to give a concise state-of-the-art introduction to all subjects involved in train automation. The second part gives insights about how *TRENCAT* is structured with no specific programming language implementation details.
 
 .. note::
 	As `Carlos Ivorra <https://www.uv.es/=ivorra/>`_ says, *Mathematics not written in LaTeX are not serious mathematics*. Writing mathematics in HTML is more painful than writing in LaTeX. Seriously, just check the source of :ref:`conflict-resolution-problem-model` and you'll understand it. Docs are written in raw HTML because `solutions provided <http://www.sphinx-doc.org/es/stable/ext/math.html>`_ don't look pleasant, comfortable and lightweight enough at the time of writing.
