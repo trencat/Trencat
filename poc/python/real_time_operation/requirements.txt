@@ -1,0 +1,6 @@
+attrs==18.2.0
+decorator==4.3.0
+hypothesis==3.82.1
+networkx==2.2
+PySCIPOpt==2.0.2
+
