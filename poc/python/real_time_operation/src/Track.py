@@ -1,5 +1,3 @@
-"""TODO"""
-
 from collections import namedtuple
 
 Segment = namedtuple('Segment', 'length max_speed slope bend_radius tunnel')
@@ -13,12 +11,12 @@ class Track:
 
             Args:
                 length (:obj:`tuple` or :obj:`list` of float): Length of each track segment.
-                max_speed (:obj:`tuple` or :obj:`list` of float): Maximum velocity allowed at each track segment.
+                max_speed (:obj:`tuple` or :obj:`list` of int): Maximum velocity allowed at each track segment.
                 slope (:obj:`tuple` or :obj:`list` of float): Slope of each track segment.
                 bend_radius (:obj:`tuple` or :obj:`list` of float): Bend radius of each track segment. The value of a
-                non-curved segment must be `math.inf`.
+                    non-curved segment must be `math.inf`.
                 tunnel (:obj:`tunnel` or :obj:`list` of bool): Boolean tuple indicating if each segment track runs in a
-                tunnel or not.
+                    tunnel or not.
         """
         if not len(length) == len(max_speed) == len(slope) == len(bend_radius) == len(tunnel):
             raise ValueError('All tuples must have the same length.')
