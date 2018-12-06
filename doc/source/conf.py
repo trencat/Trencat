@@ -78,7 +78,7 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -105,7 +105,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'TrenCATdoc'
+htmlhelp_basename = 'TRENCATdoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -132,7 +132,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'Trencat.tex', 'TrenCAT Documentation',
+    (master_doc, 'Trencat.tex', 'TRENCAT Documentation',
      'J. Homs', 'manual'),
 ]
 
@@ -142,7 +142,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'trencat', 'TrenCAT Documentation',
+    (master_doc, 'trencat', 'TRENCAT Documentation',
      [author], 1)
 ]
 
@@ -153,8 +153,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'TrenCAT', 'TrenCAT Documentation',
-     author, 'TrenCAT', 'One line description of project.',
+    (master_doc, 'TrenCAT', 'TRENCAT Documentation',
+     author, 'TRENCAT', 'TRENCAT is a train simulator platform prepared aimed to any student who wants to put into practice his/her own research in Train Automation Technologies.',
      'Miscellaneous'),
 ]
 

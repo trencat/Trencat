@@ -12,7 +12,7 @@ This chapter gives an insight of the internal structure of the simulator. It int
 Modules overview
 ****************
 
-*TrenCAT* is a simulator platform prepared for any student who wants to put into practice his/her own research in Train Automation Technologies. This assumption have an impact on software design. As a consequence, the software is divided in modules, each one with a specific task to carry out. Such modules are classified in a tight hierarchical structure according to their contribution, as shown in the following figure.
+*TRENCAT* is a simulator platform prepared for any student who wants to put into practice his/her own research in Train Automation Technologies. This assumption have an impact on software design. As a consequence, the software is divided in modules, each one with a specific task to carry out. Such modules are classified in a tight hierarchical structure according to their contribution, as shown in the following figure.
 
 .. figure:: /_static/simulator_hierarchical_structure.jpg
    :alt: Simulator hierarchical structure.
@@ -72,14 +72,14 @@ Finally, the Train got safely to a station and stopped. Now the :term:`ATS` wait
 In future releases the train may implement other modules which may be accessible via requests to the Train process.
 
 .. note::
-	The :term:`ATS` module will run in its own process and users are free to implement their own :term:`ATS` in any programming language as long as it sticks with the protocol. Users are encouraged to use *TrenCAT* as a platform to test their :term:`ATS` implementations and see how such implementations react to many different simulated scenarios. By default, *TrenCAT* implements an :term:`ATS` based on chapter :ref:`speed-profile-optimization`.
+	The :term:`ATS` module will run in its own process and users are free to implement their own :term:`ATS` in any programming language as long as it sticks with the protocol. Users are encouraged to use *TRENCAT* as a platform to test their :term:`ATS` implementations and see how such implementations react to many different simulated scenarios. By default, *TRENCAT* implements an :term:`ATS` based on chapter :ref:`speed-profile-optimization`.
 
 
 	
 Train and The Train Manager
 ===========================
 
-The Train Manager is a key process in the *TrenCAT* infrastructure as it controls and orchestrates the entire ecosystem.
+The Train Manager is a key process in the *TRENCAT* infrastructure as it controls and orchestrates the entire ecosystem.
 
    - It receives information in real time of each train: position, velocity, acceleration, statuses (stopped, running, how much people each train is carrying, etc).
    - It monitors the status and events of each station, for example, how many people are there in the platforms.
@@ -114,7 +114,7 @@ The Demand Manager simulates the demand of people in a railway system. In practi
    Communication between the Demand Manager and the Train Manager.
 
 .. note::
-	The Demand Manager will run in its own process and users are free to implement their own manager in any programming language as long as it sticks with the protocol. Users are encouraged to use *TrenCAT* as a platform to test their Demand Manager implementations and see how such implementations react to many different simulated scenarios. Currently *TrenCAT* has not started designing this manager yet.
+	The Demand Manager will run in its own process and users are free to implement their own manager in any programming language as long as it sticks with the protocol. Users are encouraged to use *TRENCAT* as a platform to test their Demand Manager implementations and see how such implementations react to many different simulated scenarios. Currently *TRENCAT* has not started designing this manager yet.
 
    
 Railway Traffic Control, Rolling Stock Planning and :term:`SCADA`
@@ -141,7 +141,7 @@ The following two figures briefly depict the communications that take place betw
    Communication from the near real time layer to the Train Manager.
 
 .. note::
-	The :term:`RTC` and :term:`RSP` modules will run in their own processes (either periodically and on-demand) and users are free to implement their modules in any programming language as long as they sticks with the protocol. Users are encouraged to use *TrenCAT* as a platform to test their implementations and see how they react to many different simulated scenarios. By default, *TrenCAT* implements a :term:`RTC` based on chapter :ref:`railway-traffic-control` and a :term:`RSP` based on chapter :ref:`optimal-rolling-stock-planning`.
+	The :term:`RTC` and :term:`RSP` modules will run in their own processes (either periodically and on-demand) and users are free to implement their modules in any programming language as long as they sticks with the protocol. Users are encouraged to use *TRENCAT* as a platform to test their implementations and see how they react to many different simulated scenarios. By default, *TRENCAT* implements a :term:`RTC` based on chapter :ref:`railway-traffic-control` and a :term:`RSP` based on chapter :ref:`optimal-rolling-stock-planning`.
 
 
 Previous topic: :ref:`introduction-railway-infrastructure-design-theory`.

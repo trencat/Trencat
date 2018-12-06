@@ -1,77 +1,30 @@
-# TrenCAT
+![TRENCAT logo](./doc/source/_static/brand/logo_horizontal.png)
 
-*TrenCAT* is a train simulator platform prepared for any student who wants to put into practice his/her own research in Train Automation Technologies. *Trencat* allows users to test custom implementations in **Optimal Railway Layout Design**, **Optimal Train Scheduling**, **Optimal Rolling Stock Planning**, **Real Time Unattended Train Operation** and **Passenger Demand modelisation**.
+# TRENCAT
 
-Currently *TrenCAT* is being designed and no implementation has yet started.
+*TRENCAT* is a train simulator platform prepared for any student who wants to put into practice his/her own research in Train Automation Technologies. *TRENCAT* allows users to test custom implementations in **Optimal Railway Layout Design**, **Optimal Train Scheduling**, **Optimal Rolling Stock Planning**, **Real Time Unattended Train Operation** and **Passenger Demand modelisation**. Check the official documentation https://trencat.readthedocs.io/en/latest/.
+
+## Developing stage
+
+Currently *TRENCAT* is implementing proofs of concepts of the state of the art algorithms and the architecture explained in documentation.
 
 ## Getting Started
 
-This section will be filled in the future.
+Every proof of concept includes a Dockerfile to run it in a Docker (Linux based) container. *TRENCAT* is available in all platforms supporting Docker.
 
-### Prerequisites
+## Prerequisites
 
-This project is based in Python 3.6.
+All docker images and containers have been created with Docker Client version `19.09.0` and Docker Engine - Community `18.09.0` (API version `1.39`).
 
-### Installing
+## Official documentation
 
-This section will be filled in the future.
+Check the official documentation: https://trencat.readthedocs.io/en/latest/.
 
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-## Deployment
-
-This section will be filled in the future.
-
-## Compile documentation
-
-In Windows, open a console in the source folder:
-
-```
-:: Install virtualenv if you don't have it yet
-pip install virtualenv
-
-:: Create a virtualenv just for documentation libraries
-virtualenv virtualenv_doc
-
-:: Activate it
-virtualenv_doc\\Scripts\\activate.bat
-
-:: Install Sphinx and dependencies
-pip install -r doc\\requirements.txt
-
-:: Build html documentation in doc\\build\\html
-cd doc
-sphinx-build -b html source build\\html
-```
-
-In Linux, open the command line in the source folder
-
-```
-# Install pip if you don't have it yet
-sudo apt install python3-pip
-
-# Install virtualenv if you don't have it yet
-sudo pip3 install virtualenv
-
-# Create a virtualenv just for documentation libraries
-virtualenv virtualenv_doc
-
-# Activate it
-source virtualenv_doc/bin/activate
-
-# Install Sphinx and dependencies
-pip install -r doc/requirements.txt
-
-# Build html documentation in doc/build/html
-cd doc
-sphinx-build -b html source build/html
-```
+If you want to compile documentation on your computer, follow the [instructions](./doc/README.md) in the `doc` folder
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](https://github.com/Joptim/Trencat/blob/master/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [CONTRIBUTING.md](./CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Versioning
 
@@ -83,7 +36,7 @@ See the list of [contributors](https://github.com/Joptim/Trencat/graphs/contribu
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](./LICENSE) file for details
 
 ## Acknowledgments
 

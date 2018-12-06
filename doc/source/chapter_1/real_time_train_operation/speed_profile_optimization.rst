@@ -26,7 +26,7 @@ The speed profile generation problem has been solved from many points of view. C
    - Using predictive optimization control.
    - A large etc.
 
-Currently *TrenCAT* implements a Mixed Integer Linear Programming approach for a single train greatly explained in [WNBS]_. Documentation would look really nice if such model was included here. However, it is a bit verbose, and there is no point in copy/pasting all computations. Instead, it is strongly recommend to enjoy the reading directly from the author.
+Currently *TRENCAT* implements a Mixed Integer Linear Programming approach for a single train greatly explained in [WNBS]_. Documentation would look really nice if such model was included here. However, it is a bit verbose, and there is no point in copy/pasting all computations. Instead, it is strongly recommend to enjoy the reading directly from the author.
 
 Previous topic: :ref:`automatic-train-control`.
 
