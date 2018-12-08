@@ -4,12 +4,12 @@
 Automated Train Techonolgies: An introduction
 *********************************************
 
-Definitions and motivations
-===========================
+Definitions
+===========
 
-Traditionally, trains were driven manually by train drivers. As soon as wailway transport grew in popularity, authorities realised the importance of train coordination since more and more trains were circulating and sharing the same tracks. At the beginning signalling was based in track side light signals and even human body language, which was inherently unefficient. In addition, train circulation was heavily dependent on driver knowledge, skills and expertise, which was also really unefficient. Sadly, lots of accidents took place due to poor communication technology and a null safety infrastructure. Check [C]_ for a history of railway railway signalling.  
+Traditionally, trains were driven manually by train drivers. As soon as railway transport grew in popularity, authorities realised the importance of train coordination since more and more trains were circulating and sharing the same tracks. At the beginning signalling was based in track side light signals and even human body language, which was inherently unefficient. In addition, train circulation was heavily dependent on driver knowledge, skills and expertise, which was also really unefficient. Sadly, lots of accidents took place due to poor communication technology and a null safety infrastructure. Check [C]_ for a history of railway railway signalling.  
 
-Nowadays, train public transport has achieved an impressive level of safety, punctuality, speed and energy efficiency due to automation. At the time of writing, the `L’Union Internationale des Transports Publics <http://www.uitp.org/>`_ (International Association of Public Transport, :term:`UITP`) defines automation in metro systems as follows [UITP-PK]_:
+Nowadays, train public transport has achieved an impressive level of safety, punctuality, speed and energy efficiency due to automation. At the time of writing these words, the `L’Union Internationale des Transports Publics <http://www.uitp.org/>`_ (International Association of Public Transport, :term:`UITP`) defines automation in metro systems as follows [UITP-PK]_:
 
 	"In metro systems, automation refers to the process by which responsibility for operation management of the trains is transferred from the driver to the train control system."
 
@@ -20,6 +20,16 @@ In other words, trains are able to be driven by computer software without the pr
 - **GoA2**: It corresponds to *semi-automatic train operation* (:term:`STO`) where starting and stopping is automated, but a driver operates the doors, drives the train if needed and handles emergencies.
 - **GoA3**: It corresponds to *driverless train operation* (:term:`DTO`) where starting and stopping are automated but a train attendant operates the doors and drives the train in case of emergencies.
 - **GoA4**: It corresponds to *unattended train operation* (:term:`UTO`) where starting and stopping, operation of doors and handling of emergencies are fully automated without any on train staff.
+
+The next figure summarises the key concepts. The terms (:term:`ATP`) and (:term:`ATO`) in the figure will be introduced later in :ref:`real-time-train-operation`.
+
+.. figure:: /_static/GoA_UITP.png
+   :alt: Summary of Grades of Automation.
+   
+   Relation between Grades of Automation (:term:`GoA`) and the three Automatic Train Technologies. Obtained from [UITP-PK]_.
+
+Motivations
+===========
 
 Train automation brings many benefits.
 
@@ -34,7 +44,7 @@ Structure
 
 This section is mainly based on [WNBS]_ and [YTYXHG]_\ .
 
-A railway system essentially consists of three elements: **infrastructure** (line tracks, stations, signalling equipments, etc.), a **rolling stock** of trains circulating on tracks and the **operation rules** taking care of safety and operation efficiency. Additionally, railway systems can be classified in two types: **interurban** and **urban** systems. In interurban systems, trains share a limited resource of tracks and line overlaps and trains usually overtake and meet each other. In urban systems lines are not so scarce since tracks are separated from each other and each direction of the line has a dedicated infrastructure. This project focuses on underground railway infrastructure, which is a particular case of urban systems. However, all concepts introduced here are still valid for interurban systems.
+A railway system essentially consists of three elements: **infrastructure** (line tracks, stations, signalling equipments, communication infrastructure such as radio-comms and wireless internet, etc.), a **rolling stock** of trains circulating on tracks and the **operation rules** taking care of safety and operation efficiency. Additionally, railway systems can be classified in two types: **interurban** and **urban** systems. In interurban systems, trains share a limited resource of tracks, lines overlap and trains usually meet and overtake each other. In urban systems lines are not so scarce since tracks are separated from each other and each direction of the line has a dedicated infrastructure.
 
 In railway systems, the operation of trains follow a clear hierarchical framework with five levels: **scheduling**, **real-time (re)scheduling**, **remote traffic control**,  **interlocking and signalling** and **train & infrastructure control**. 
 
@@ -45,11 +55,11 @@ In railway systems, the operation of trains follow a clear hierarchical framewor
 
 **Scheduling**
 
-First, the railway transportation system is formulated on the basis of an extensive planning stage, which consists in deciding how many convoys are running at each period of time and planning a timetable. This planning stage is carried out a long time before the real-time operations taking into account demand estimation. Next, the railway managers need to assign the available resources, including the rolling stock and crew duties to the trips in this timetable.
+First, the railway transportation system is formulated on the basis of an extensive planning stage, which consists in deciding how many convoys are running at each period of time and planning a timetable. This planning stage is carried out a long time before real-time operations taking into account demand estimation. Next, the railway managers need to assign the available resources, including the rolling stock and crew duties to the trips in this timetable.
 
 **Real-time (re)scheduling**
 
-During real-time operations, convoys may not adhere to the planning due to many external factors, such as failures, delays, interruptions, issues in the track infrastructure or a significant increase/decrease of passengers demand among many others. Hence, during real-time operation, the planning (this is, the rolling stock, timetable, etc) is usually rescheduled several times with real-time data collected.
+During real-time operations, convoys may not adhere to the planning due to many external factors, such as failures, delays, interruptions, issues in the track infrastructure or a significant increase/decrease of passengers demand among many others. Hence, during real-time operation, the planning (this is, the rolling stock, timetable, etc) is usually rescheduled several times with real-time data.
 
 **Interlocking and signalling**
 
@@ -69,7 +79,3 @@ The following figure summarises how all levels integrate in the railway system.
 .. As seen in :ref:`benefits-automation`, there are three main goals of train automation: to provide passengers with a better quality of service, to reduce financial costs by increasing energy efficiency, which also makes this means of transport more environmentally friendly and to ensure maximum security to passengers. Every decision taken by automated train algorithms must take these three goals into account.
 
 .. Next, the scheduled (or rescheduled) planning is communicated to each in-service train, whose goal is to conduct a safe, scheduled and efficient travel that meets with the objectives in :ref:`benefits-automation`. With the given scheduled timetable, line infrastructure data and internal on-board computer data, the on-board computer generates a speed profile from the current station to the next one. This is, it decides the acceleration, cruising, coasting and braking periods to be carried out until next station. The whole train journey is supervised by :term:`ATP` and :term:`ATS` systems, which will break the train if security conditions are not being fulfilled (for example, by exceeding speed limit, overrunning a red sempathore, etc).
-
-Previous topic: :ref:`optimal-layout-design`.
-
-Next topic: :ref:`railway-traffic-control`.

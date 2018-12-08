@@ -9,7 +9,3 @@ The railway infrastructure layout is the result of history. Traditionally, railw
 
 .. note::
    This module is not designed yet, and it is not a top priority task. Would you like to contribute by writing state of the art theory? `Join us! <https://github.com/Joptim/Trencat/blob/master/CONTRIBUTING.md>`_
-
-Previous topic: :ref:`introduction-railway-infrastructure-design-theory`. 
-
-Next topic: :ref:`introduction-att-technologies`.

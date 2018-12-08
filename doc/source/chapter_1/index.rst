@@ -6,7 +6,7 @@ Introduction to Railway Infrastructure Design theory
 
 This chapter introduces the mathematical theory necessary to design and build an efficient railway infrastructure. It covers the **Optimal Layout Design**, **Optimal Train Scheduling**, **Optimal Rolling Stock Planning**, **Real Time Automatic Train Operation**, **Train Coordination** and **Passenger demand simulation**.
 
-Yet there is not a unique field of knowledge that solves this problem, we will focus on the theory included in default modules implementation.
+Yet there is not a unique field of knowledge that solves this problem, we will focus on the default algorithms included in the platform.
 
 .. toctree::
    :maxdepth: 1
@@ -18,7 +18,3 @@ Yet there is not a unique field of knowledge that solves this problem, we will f
    optimal_rolling_stock_planning/index
    real_time_train_operation/index
    passenger_demand_modelling/index
-
-Previous topic: :ref:`project-information`.
-
-Next topic: :ref:`designing-railway-simulator`.
