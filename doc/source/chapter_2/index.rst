@@ -142,6 +142,3 @@ The following two figures briefly depict the communications that take place betw
 
 .. note::
 	The :term:`RTC` and :term:`RSP` modules will run in their own processes (either periodically and on-demand) and users are free to implement their modules in any programming language as long as they sticks with the protocol. Users are encouraged to use *TRENCAT* as a platform to test their implementations and see how they react to many different simulated scenarios. By default, *TRENCAT* implements a :term:`RTC` based on chapter :ref:`railway-traffic-control` and a :term:`RSP` based on chapter :ref:`optimal-rolling-stock-planning`.
-
-
-Previous topic: :ref:`introduction-railway-infrastructure-design-theory`.

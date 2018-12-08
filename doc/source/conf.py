@@ -19,9 +19,9 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'TrenCAT'
-copyright = '2018, J. Homs'
-author = 'J. Homs'
+project = 'TRENCAT'
+copyright = '2018, J. H.'
+author = 'J. H.'
 
 # The short X.Y version
 version = ''
@@ -43,6 +43,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
     'sphinx.ext.githubpages',
+    'sphinx.ext.mathjax',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -133,7 +134,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'Trencat.tex', 'TRENCAT Documentation',
-     'J. Homs', 'manual'),
+     'J. H.', 'manual'),
 ]
 
 
@@ -153,7 +154,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'TrenCAT', 'TRENCAT Documentation',
+    (master_doc, 'TRENCAT', 'TRENCAT Documentation',
      author, 'TRENCAT', 'TRENCAT is a train simulator platform prepared aimed to any student who wants to put into practice his/her own research in Train Automation Technologies.',
      'Miscellaneous'),
 ]
@@ -170,3 +171,12 @@ intersphinx_mapping = {'https://docs.python.org/': None}
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
+
+# -- Options for mathjax extension -------------------------------------------
+
+#mathjax_path='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js'
+
+#mathjax_options = {
+#    'integrity': 'sha384-......',
+#}
+

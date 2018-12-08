@@ -3,9 +3,6 @@
 Introducing conflict resolution problem
 ---------------------------------------
 
-.. role:: raw-html(raw)
-   :format: html
-
 The aim of the :term:`CRP` is to develop a conflict free schedule such that the overall deviation from the planned schedule is minimized. The problem is addressed under the `Operations Research <https://en.wikipedia.org/wiki/Operations_research>`_ point of view. Let's first introduce the model by means of an example, then we'll move to a rigorous mathematical formulation and finally, we'll elaborate a more complex example.
 
 The next figure shows a simple example involving two trains. Train t\ :sub:`1` must depart in 5 minutes from *Station A* and heads to *Station B* while train t\ :sub:`2` must depart now from *Station C* to *Station D*. The running time of each track segment is shown below. As it can be seen, both trains require the *track segment 3* in the same period of time.
@@ -15,7 +12,7 @@ The next figure shows a simple example involving two trains. Train t\ :sub:`1` m
    
    Small network framework with two trains four stations and five track segments.
 
-The next step is to build an *alternative graph* which models this situaltion. An **alternative graph** is a directed graph *G=(N,E,A)* where nodes in *N* are the operations that this train must perform and edges in *E* indicate the order of such operations. We will talk about *A* later. For instance, next figure shows an (incomplete) alternative graph for this setup.
+The next step is to build an *alternative graph* which models this situaltion. An **alternative graph** is a directed graph :math:`G=(N,E,A)` where nodes in :math:`N` are the operations that this train must perform and edges in :math:`E` indicate the order of such operations. We will talk about set :math:`A` later. For instance, next figure shows an (incomplete) alternative graph for this setup.
 
 .. figure:: /_static/incomplete_alternative_graph_introduction.jpg
    :alt: Incomplete alternative graph.
@@ -24,39 +21,39 @@ The next step is to build an *alternative graph* which models this situaltion. A
 
 We use the following notation:
    
-   - Operations p\ :sub:`r`\ : Track segment *r* is occupied by a train. In other words, there is a train running through segment *r* with a running time of f\ :sub:`r`\ .
-   - Operation p\ :sub:`B`\ : A train enters *Station B* with a running time of f\ :sub:`B` minutes.
-   - Operation p\ :sub:`D`\ : A train enters *Station D* with a running time of f\ :sub:`D` minutes.
+   - Operations :math:`p_r`\ : Track segment :math:`r` is occupied by a train. In other words, there is a train running through segment :math:`r` with a running time of :math:`f_{p_r}`\ .
+   - Operation :math:`p_B`\ : A train enters *Station B* with a running time of :math:`f_{p_B}` minutes.
+   - Operation :math:`p_D`\ : A train enters *Station D* with a running time of :math:`f_{p_D}` minutes.
 
-Additionally two *dummy* nodes are added which indicate the start time of the first operation of the alternative graph to be performed (node p\ :sub:`0`\) and end time when all operations have finished (node p\ :sub:`x`\ ). Let's take a close look to the alternative graph for train t\ :sub:`1`\ :
+Additionally two *dummy* nodes are added which indicate the start time of the first operation of the alternative graph to be performed (node :math:`p_0`\) and end time when all operations have finished (node :math:`p_x`\ ). Let's take a close look to the alternative graph for train :math:`t_1`\ :
 
-   - At time *t=0*, train t\ :sub:`1` must wait *5* minutes before departure.
-   - Then, at any time *t* :raw-html:`&ge;`\ *5* the train must run through segment *1* in *12* minutes.
-   - Then, at any time *t* :raw-html:`&ge;`\ *18* the train must run through segment *3* in *12* minutes.
-   - Then, at any time *t* :raw-html:`&ge;`\ *30* the train must run through segment *4* in *8* minutes.
-   - Then, at any time *t* :raw-html:`&ge;`\ *38* the train must enter the station in *30* seconds.
+   - At time :math:`t=0`, train :math:`t_1` must wait *5* minutes before departure.
+   - Then, at any time :math:`t\geq 5` the train must run through segment *1* in *12* minutes.
+   - Then, at any time :math:`t\geq 18` the train must run through segment *3* in *12* minutes.
+   - Then, at any time :math:`t\geq 30` the train must run through segment *4* in *8* minutes.
+   - Then, at any time :math:`t\geq 38` the train must enter the station in *30* seconds.
    - Then, its trip is finised.
 
-The same reasoning applies for train t\ :sub:`2`\ . Thus, if we define **optimisation variables** s\ :raw-html:`<sub>t<sub>i</sub>,p<sub>r</sub></sub>` as the starting time of operation p\ :sub:`r`  performed by train t\ :sub:`i` and s\ :raw-html:`<sub>p<sub>0</sub></sub>` and s\ :raw-html:`<sub>p<sub>x</sub></sub>` as the starting times of *dummy* operations p\ :sub:`0` and p\ :sub:`x` respectively, it is straightforward to see that:
+The same reasoning applies to train :math:`t_2`\ . Thus, if we define **optimisation variables** :math:`s_{t_1, p_1}` as the starting time of operation :math:`p_r`  performed by train :math:`t_i` and :math:`s_{p_0}` and :math:`s_{p_x}` as the starting times of *dummy* operations :math:`p_0` and :math:`p_x` respectively, it is straightforward to see that:
 
-============================================================================================================================================================ ============================================================================================================================================================
-Constraints for train t\ :sub:`1`                                                                                                                            Constraints for train t\ :sub:`2`                                            
-============================================================================================================================================================ ============================================================================================================================================================
-s\ :raw-html:`<sub>t<sub>1</sub>,p<sub>1</sub></sub> &ge;` s\ :raw-html:`<sub>p<sub>0</sub></sub>` +  f\ :raw-html:`<sub>t<sub>1</sub>,p<sub>0</sub></sub>`  s\ :raw-html:`<sub>t<sub>2</sub>,p<sub>2</sub></sub> &ge;` s\ :raw-html:`<sub>p<sub>0</sub></sub>` +  f\ :raw-html:`<sub>t<sub>2</sub>,p<sub>0</sub></sub>` 
-s\ :raw-html:`<sub>t<sub>1</sub>,p<sub>3</sub></sub> &ge;` s\ :raw-html:`<sub>t<sub>1</sub>,p<sub>1</sub></sub>` +  f\ :raw-html:`<sub>p<sub>1</sub></sub>`  s\ :raw-html:`<sub>t<sub>2</sub>,p<sub>3</sub></sub> &ge;` s\ :raw-html:`<sub>t<sub>2</sub>,p<sub>2</sub></sub>` +  f\ :raw-html:`<sub>p<sub>2</sub></sub>` 
-s\ :raw-html:`<sub>t<sub>1</sub>,p<sub>4</sub></sub> &ge;` s\ :raw-html:`<sub>t<sub>1</sub>,p<sub>3</sub></sub>` +  f\ :raw-html:`<sub>p<sub>3</sub></sub>`  s\ :raw-html:`<sub>t<sub>2</sub>,p<sub>5</sub></sub> &ge;` s\ :raw-html:`<sub>t<sub>2</sub>,p<sub>3</sub></sub>` +  f\ :raw-html:`<sub>p<sub>3</sub></sub>` 
-s\ :raw-html:`<sub>t<sub>1</sub>,p<sub>B</sub></sub> &ge;` s\ :raw-html:`<sub>t<sub>1</sub>,p<sub>4</sub></sub>` +  f\ :raw-html:`<sub>p<sub>4</sub></sub>`  s\ :raw-html:`<sub>t<sub>2</sub>,p<sub>D</sub></sub> &ge;` s\ :raw-html:`<sub>t<sub>2</sub>,p<sub>5</sub></sub>` +  f\ :raw-html:`<sub>p<sub>5</sub></sub>` 
-s\ :raw-html:`<sub>p<sub>x</sub></sub> &ge;` s\ :raw-html:`<sub>t<sub>1</sub>,p<sub>B</sub></sub>` +  f\ :raw-html:`<sub>p<sub>B</sub></sub>`                s\ :raw-html:`<sub>p<sub>x</sub></sub> &ge;` s\ :raw-html:`<sub>t<sub>2</sub>,p<sub>D</sub></sub>` +  f\ :raw-html:`<sub>p<sub>D</sub></sub>`
-============================================================================================================================================================ ============================================================================================================================================================
+=============================================== ==============================================
+Constraints for train :math:`t_1`               Constraints for train :math:`t_2`
+=============================================== ==============================================
+:math:`s_{t_1,p_1} \geq s_{p_0} + f_{t_1,p_0}`  :math:`s_{t_2,p_2} \geq s_{p_0} + f_{t_2,p_0}`
+:math:`s_{t_1,p_3} \geq s_{t_1, p_1} + f_{p_1}` :math:`s_{t_2,p_3} \geq s_{t_2,p_2} + f_{p_2}`
+:math:`s_{t_1,p_4} \geq s_{t_1, p_3} + f_{p_3}` :math:`s_{t_2,p_5} \geq s_{t_2,p_3} + f_{p_3}`
+:math:`s_{t_1,p_B} \geq s_{t_1, p_4} + f_{p_4}` :math:`s_{t_2,p_D} \geq s_{t_2,p_5} + f_{p_5}`
+:math:`s_{p_x} \geq s_{t_1, p_B} + f_{p_B}`     :math:`s_{p_x} \geq s_{t_2,p_D} + f_{p_D}`
+=============================================== ==============================================
 
-Notice, however, that there is a conflict between two trains since both demand the same operation p\ :sub:`3`. If trains circulate according to schedule, the train t\ :sub:`2` is the first one to enter segment *3* and train t\ :sub:`1` will have to wait three minutes until the former one leaves the segment, plus an extra safety time. We must impose that either t\ :sub:`1` precedes t\ :sub:`2` or the opposite. This is accomplished with the following constraints.
+Notice, however, that there is a conflict between two trains since both demand the same operation :math:`p_3`. We must impose that either :math:`t_1` precedes :math:`t_2` or vice versa. For example, we may impose that :math:`t_2` will run through segment :math:`p_3` after :math:`t_1` plus an extra safety time :math:`f_{p_4, p_3}`, or vice versa. This behaviour is accomplished with the following constraints.
 
-   - s\ :raw-html:`<sub>t<sub>2</sub>,p<sub>3</sub></sub>` :raw-html:`&ge;` s\ :raw-html:`<sub>t<sub>1</sub>,p<sub>4</sub></sub>` + f\ :raw-html:`<sub>p<sub>4</sub>,p<sub>3</sub></sub>` **or** s\ :raw-html:`<sub>t<sub>1</sub>,p<sub>3</sub></sub>` :raw-html:`&ge;` s\ :raw-html:`<sub>t<sub>2</sub>,p<sub>5</sub></sub>` + f\ :raw-html:`<sub>p<sub>5</sub>,p<sub>3</sub></sub>`\ , **but not both**.
+   - :math:`s_{t_2,p_3} \geq s_{t_1,p_4} + f_{p_4,p_3}` **or** :math:`s_{t_1,p_3} \geq s_{t_2,p_5} + f_{p_5,p_3}`, **but not both**.
 
-Last disjunction constraints can be linearised by introducing a large positive number *M* and a binary variable x\ :raw-html:`<sub>t<sub>1</sub>p<sub>3</sub>,t<sub>2</sub>p<sub>3</sub></sub>` that determines if train t\ :sub:`1` must perform p\ :sub:`3` before t\ :sub:`2` performs p\ :sub:`3` (value *1*) or the opposite (value *0*).
+Last disjunction constraints can be linearised by introducing a large positive number :math:`M` and a binary variable :math:`x_{t_1p_3,t_2p_3}` that determines if train :math:`t_1` must perform :math:`p_3` before :math:`t_2` performs :math:`p_3` (value *1*) or the opposite (value *0*).
 
-   - s\ :raw-html:`<sub>t<sub>2</sub>,p<sub>3</sub></sub>` :raw-html:`&ge;` s\ :raw-html:`<sub>t<sub>1</sub>,p<sub>4</sub></sub>` + f\ :raw-html:`<sub>p<sub>4</sub>,p<sub>3</sub></sub>` - M (1 - x\ :raw-html:`<sub>t<sub>1</sub>p<sub>3</sub>,t<sub>2</sub>p<sub>3</sub></sub>`)
-   - s\ :raw-html:`<sub>t<sub>1</sub>,p<sub>3</sub></sub>` :raw-html:`&ge;` s\ :raw-html:`<sub>t<sub>2</sub>,p<sub>5</sub></sub>` + f\ :raw-html:`<sub>p<sub>5</sub>,p<sub>3</sub></sub>` - M x\ :raw-html:`<sub>t<sub>1</sub>p<sub>3</sub>,t<sub>2</sub>p<sub>3</sub></sub>`
+   - :math:`s_{t_2,p_3}\geq s_{t_1,p_4} + f_{p_4,p_3} - M(1 - x_{t_1p_3,t_2p_3})`
+   - :math:`s_{t_1,p_3}\geq s_{t_2,p_5} + f_{p_5,p_3} - M(1 - x_{t_1p_3,t_2p_3})`
 
 This situation is represented in the alternative graph by adding a couple of edges as shown next.
 
@@ -65,21 +62,17 @@ This situation is represented in the alternative graph by adding a couple of edg
    
    Complete alternative graph with a pair of alternative edges to solve the conflict.
 
-This pair of edges of conflicting operations that we added in the figure are added to set *A*. Thus, set *A* is defined as *the set containing pairs of edges of conflicting operations*. Notice that this pair of edges must be added even if the two trains do not coincide in time in track segment *3*.
+This pair of edges of conflicting operations that we added in the figure are added to set :math:`A`. Thus, set :math:`A` is defined as *the set containing pairs of edges of conflicting operations*.
 
-Imagine that instead of forcing one of the trains to stop in the middle of the track we prefer them to wait in the station. In this case, the alternative graph would be the following.
+Imagine that instead of forcing one of the trains to stop in the middle of a track we prefer them to wait in the station. In this case, the alternative graph would be the following.
 
 .. figure:: /_static/complete2_alternative_graph_introduction.jpg
    :alt: Complete alternative graph 2.
    
    Complete alternative graph with different consequences when solving the conflict.
 
-Finally, our goal is to minimize the global makespan of the two trains. Then, the objective function *minimizes* s\ :raw-html:`<sub>p<sub>x</sub></sub>` - s\ :raw-html:`<sub>p<sub>0</sub></sub>`\ .
+Finally, our goal is to minimize the global makespan of the two trains. Then, the objective function *minimizes* :math:`s_{p_x} - s_{p_0}`\ .
 
-There are some important remarks. First, notice, that this objective function does not consider any penalty term on the binary decision variable x\ :raw-html:`<sub>t<sub>1</sub>p<sub>3</sub>,t<sub>2</sub>p<sub>3</sub></sub>`\ . If one of the two trains had higher priority, then the objective function should include a penalty term with x\ :raw-html:`<sub>t<sub>1</sub>p<sub>3</sub>,t<sub>2</sub>p<sub>3</sub></sub>`\ . Second, this objective function may be too simple in more complex situations. For example, if there is any conflict in the network that causes train delays, it would be interesting to minimise schedule deviation times instead of the global makespan. Third, notice that until now the running times have been considered parameters. Instead, we could consider them as variables imposing that they should be greater than minimum track segment threshold.
+There are some important remarks. First, notice, that this objective function does not consider any penalty term on the binary decision variable :math:`x_{t_1p_3,t_2p_3}`\ . If one of the two trains had higher priority, then the objective function should include a penalty term for this variable. Second, the proposed objective function may be too simple in more complex situations. For example, if there is any conflict in the network that causes train delays, it would be interesting to minimise schedule deviation times instead of the global makespan. Third, notice that until now the running times have been considered parameters. Instead, we could consider them as variables imposing that they should be greater than minimum track segment threshold.
 
 .. note:: We deliberately want to keep the model simple in the first version of the project. Therefore, all these nice extra features will not be added immediately. The idea is that the optimisation model will grow in future releases.
-
-Previous topic: :ref:`railway-traffic-control-definitions`.
-
-Next topic: :ref:`conflict-resolution-problem-model`.

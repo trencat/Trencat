@@ -1,73 +1,58 @@
+.. figure:: /_static/brand/logo_horizontal.png
+   :alt: TRENCAT logot.
+
 .. _project-information:
 
 ###################
 Project information
 ###################
 
+Developing stage
+================
+
+Currently *TRENCAT* is implementing proofs of concepts of the state of the art algorithms and the architecture explained in documentation.
+
 Getting Started
 ===============
-This section will be filled in the future.
 
-Prerequisites
--------------
-This project is based in Python 3.6.
+Every proof of concept includes a Dockerfile to run it in a Docker (Linux based) container. All docker images and containers have been created with Docker Client version `19.09.0` and Docker Engine - Community `18.09.0` (API version `1.39`).
 
-Installing
-----------
-This section will be filled in the future.
+*TRENCAT* is available in all platforms supporting Docker.
 
-Running the tests
------------------
-Explain how to run the automated tests for this system
+Official documentation
+======================
 
-Compile documentation
----------------------
+The documentation that you are reading now introduces *TRENCAT* to interested users. The first part is devoted to give a concise state-of-the-art introduction to all subjects involved in train automation. The second part gives insights about how *TRENCAT* is structured with no specific programming language implementation details.
+	
+Furthermore, each module has its own documentation, covering all language specific implementation details. Such implementation is generated with `Godoc <https://godoc.org/golang.org/x/tools/cmd/godoc>`_ for `Golang <https://golang.org/>`_ implementations and `Sphinx <http://www.sphinx-doc.org/en/master/>`_ for `Python <https://www.python.org/>`_ implementations.
 
-.. code-block:: bat
+For developers
+--------------
 
-   :: Install virtualenv if you don't have it yet
-   pip install virtualenv
-   
-   :: Create a virtualenv just for documentation libraries
-   virtualenv virtualenv_doc
-   
-   :: Activate it
-   virtualenv_doc\\Scripts\\activate.bat
-   
-   :: Install Sphinx and dependencies
-   pip install -r doc\\requirements.txt
-   
-   :: Build html documentation in doc\\build\\html
-   cd doc
-   sphinx-build -b html source build\\html
-   
+First change to the documentation directory
+
 .. code-block:: bash
 
-   # Install pip if you don't have it yet
-   sudo apt install python3-pip
-
-   # Install virtualenv if you don't have it yet
-   sudo pip3 install virtualenv
-
-   # Create a virtualenv just for documentation libraries
-   virtualenv virtualenv_doc
-
-   # Activate it
-   source virtualenv_doc/bin/activate
-
-   # Install Sphinx and dependencies
-   pip install -r doc/requirements.txt
-
-   # Build html documentation in doc/build/html
    cd doc
-   sphinx-build -b html source build/html
+
+Build the image with `Sphinx` dependencies
+
+.. code-block:: bash
+
+   sudo docker image build -t trencat_doc:poc .
 
 
-Deployment
-==========
-This section will be filled in the future.
+Run the container container that builds the docs. Parameter `--rm` deletes the container after execution. Parameter `-v` mounts the `doc` directory of the host to the `/trencat_doc` directory of the container.
 
-.. _project-information-contributing:
+.. code-block:: bash
+
+    sudo docker container run --rm -v $PWD:/trencat_doc trencat_doc:poc sphinx-build -b html /trencat_doc/source /trencat_doc/build/html
+
+Documentation is compiled in `html` inside `./build/html`. Run the last command every time you want to build the docs again.
+
+.. note::
+
+   Documentation uses `MathJax <https://www.mathjax.org/>`_ to render formulas in the web browser. You can compile documentation offline, but to render the formulas in the web browser you will need internet connection. If you want to work totally offline, you can download MathJax files and follow the Sphinx `instructions <https://www.sphinx-doc.org/en/master/usage/extensions/math.html>`_.
 
 Contributing
 ============
@@ -81,19 +66,6 @@ License
 =======
 I strongly believe in high quality open source software. This software is `licensed <https://github.com/Joptim/Trencat/blob/master/LICENSE>`_ under the `GNU General Public License v3.0 <https://choosealicense.com/licenses/gpl-3.0/>`_,  which basically means that you can do almost anything you want with your project, except to distribute closed source versions.
 
-Documentation
-=============
-The documentation that you are reading now introduces *TRENCAT* to interested users. The first part is devoted to give a concise state-of-the-art introduction to all subjects involved in train automation. The second part gives insights about how *TRENCAT* is structured with no specific programming language implementation details.
-
-.. note::
-	As `Carlos Ivorra <https://www.uv.es/=ivorra/>`_ says, *Mathematics not written in LaTeX are not serious mathematics*. Writing mathematics in HTML is more painful than writing in LaTeX. Seriously, just check the source of :ref:`conflict-resolution-problem-model` and you'll understand it. Docs are written in raw HTML because `solutions provided <http://www.sphinx-doc.org/es/stable/ext/math.html>`_ don't look pleasant, comfortable and lightweight enough at the time of writing.
-	
-Furthermore, each module has its own documentation, covering all language specific implementation details. Such implementation is generated with `Godoc <https://godoc.org/golang.org/x/tools/cmd/godoc>`_ for `Golang <https://golang.org/>`_ implementations and `Sphinx <http://www.sphinx-doc.org/en/master/>`_ for `Python <https://www.python.org/>`_ implementations.
-
 Disclaimer
 ==========
 The authors/sources of all mathematical theory explained in this project are explicitly mentioned in a deliberately visible position in documentation. It is important to check sources both for credits and for first hand information, better explained than it is here. If you are an author and have any concern about the content displayed in this project, please do not hesitate to contact me. Here you'll find the complete list of :ref:`citations`.
-
-Previous topic: :ref:`Main page <main-page>`.
-
-Next topic: :ref:`introduction-railway-infrastructure-design-theory`.
