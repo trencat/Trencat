@@ -13,6 +13,7 @@ Single-point control models
 In single-point control models, a train that consists of more than one vehicle is simplified as a single-point, which means that its dynamics can be modelled with a Newton's equation. Considering the time as the independent variable, the model states as follows:
 
 .. math::
+   :label: traindynamicseq
 
    m\rho\frac{dv(t)}{dt} = u(t) - R_b(t) - R_l(s(t), v(t))
 
@@ -29,9 +30,9 @@ where
    - :math:`R_b(v(t))`: Basic resistance including roll resintance and air resistance.
    - :math:`R_l(s(t),v(t))`: Resitance causes by track grade, curves and tunnels.
 
-.. The model has several constraints that are introduced next.
+.. note::
 
-For convenience we will denote :math:`s:=s(t)` and :math:`v:=v(t)`.
+   For convenience we will denote :math:`s:=s(t)` and :math:`v:=v(t)`.
 
 First, the traction/braking force are bounded by :math:`u_{min}(v) \leq u(t) \leq u_{max}`(v)`. According to [WNBS]_\ , usually :math:`u_{min}` and :math:`u_{max}` are considered as constant parameters although in reality they are a function of velocity due to many factors such as the maximum adhesion and characteristics of the power equipment. The expression of :math:`u_{max}` can be modelled as a quadratic piecewise function of the form
 
@@ -80,7 +81,7 @@ Terms :math:`f_c(\cdot)` and :math:`f_t(\cdot)` are based on empirical formulas.
 
    f_c(r(s)) = \frac{4.91m}{r(s) - 55} \quad \text{if } r(s)\le 300\text{ meters}
 
-Finally, a train is affected by air resistance inside a tunnel. The value of such resistance depends on the form of the tunnel as well as the smoothnes of its walls and the train walls. If there is a limiting gradient in the tunnel (a limiting gradient is defined as the maximum railway gradient that can be climed without the help of a second power unit), then the following expression applies:
+Finally, a train is affected by air resistance inside a tunnel. The value of such resistance depends on the form of the tunnel as well as the smoothnes of its walls and the train walls. If there is a limiting gradient in the tunnel (which is defined as the maximum railway gradient that can be climed without the help of a second power unit), then the following expression applies [WNBS]_:
 
 .. math::
 
@@ -91,7 +92,6 @@ On the contrary, if there is no limiting gradient, the following expression appl
 .. math::
 
    f_t(l_t(s), v) = 1.3\cdot10^{-7}l_t(s)mg.
-
 
 Finally, :math:`f_t(l_t(s), v)` equals zero outside tunnels.
 
