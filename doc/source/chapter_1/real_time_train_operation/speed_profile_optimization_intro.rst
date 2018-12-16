@@ -17,7 +17,7 @@ The speed profile generation problem has been solved from many points of view. C
 .. speed-profile-optimization-definitions:
 
 Definitions
-^^^^^^^^^^^
+```````````
 
 Consider that we start from a train station *A* and that we must drive the train to another station *B*, which is *10km* away, in exactly :math:`T` seconds. During our journey, the train can be found in four different stages: **acceleration**, **cruising**, **coasting** and **braking**. To understand better these states, recall the Newton's train dynamics equation :eq:`traindynamicseq` introduced in :ref:`train-dynamic-models`, and let us solve it for the acceleration of the train:
 
@@ -37,7 +37,7 @@ The sign of the traction/bracking force is important. If :math:`u(t) > 0`, then 
 .. speed-profile-optimization-introduction:
 
 Introducing the optimal speed profile problem
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+`````````````````````````````````````````````
 
 To begin with, the next figure shows some examples of a speed profiles.
 
@@ -73,85 +73,3 @@ We are almost there. The blue dots in the previous figure have been deliverately
 This figure shows that certain states cannot be reached due to phisical constraints, such as maximum acceleration/braking force reached. The graph only contains links to feasible states.
 
 Now that the problem is modelled as a graph, to find the most efficient driving profile is equivalent to solve a *minimum flow problem* on a graph/network, where the cost of each link is the work done by the train to move from one state to the next one, while sticking to timetable requirements. The rest of the section is devoted to compute such work.
-
-Computing physical magnitudes
-"""""""""""""""""""""""""""""
-
-Consider the situation in the next figure. The train is in position :math:`s_i` with velocity :math:`v_i` at time :math:`t_i` and it has to accelerate to achieve velocity :math:`v_j` at position :math:`s_j`. We want to know how much time the train needs to carry out this transition, how much `work <https://en.wikipedia.org/wiki/Work_(physics)>`_ it will do and what's the train average `power <https://en.wikipedia.org/wiki/Power_(physics)>`_ over this segment.
-
-.. figure:: /_static/speed_profile_introduction_4.jpg
-   :alt: Moving from one state to the next one.
-   
-   Moving from one state to the next one.
-
-To simplify computations, let's assume that this transition is done with constant acceleration. The time needed for this transition is computed using kinemic formula :math:`\Delta s = \frac{1}{2}(v_j + v_i)\Delta t`:
-
-.. math::
-
-    \Delta t = \frac{2\Delta s}{v_j + v_i},\quad \text{i.e.} \quad t_j = t_i + \frac{2(s_j-s_i)}{v_j+v_i}.
-
-.. note::
-
-   The previous formula is not valid if both :math:`v_i` and :math:`v_j` equal zero. Since the train is stopped it implies that :math:`s_i =  s_j`, which contradicts the situation depticted (:math:`s_j > s_i`).
-
-Time train acceleration is straightforward to compute:
-
-.. math::
-
-    a = \frac{\Delta v}{\Delta t} = \frac{v_j-v_i}{t_j-t_i}.
-
-The computation of the work done by the train is a bit tricky. A way to compute the work done by the train in this segment is:
-
-.. math::
-
-   W_{ij} = \int_{t_i}^{t_j}u(t)v(t)dt
-
-Recall again Newton's equation :eq:`traindynamicseq`. Due to the space discretization, the term :math:`mg\sin(s)` is constant in the entire segment. In addition, the term :math:`l_t(s)` is also constant in the entire segment. Acceleration :math:`a` is also constant along the track by assumption. Therefore, :eq:`traindynamicseq` can be refactored as
-
-.. math::
-
-   m\rho a = u(t) - C_1 - C_2 v^2(t),
-
-where :math:`C_1` and :math:`C_2` are constants. The work done by the train in this segment is computed as the integral of traction force times velocity:
-
-.. math::
-
-   \begin{array}{rl}
-   W_{ij} =& \int_{t_i}^{t_j}u(t)v(t)dt\\
-     =& \int_{t_i}^{t_j} (m\rho a + C_1)v(t)dt + \int_{t_i}^{t_j}C_2v^3(t)dt\\
-     \stackrel{v(t) = at}=& (m\rho a^2 + aC_1)\int_{t_i}^{t_j}tdt + a^3 C_2\int_{t_i}^{t_j}t^3dt\\
-     =& (m\rho a^2 + aC_1)\frac{t_j^2 - t_i^2}{2} + a^3 C_2\frac{t_j^4 - t_i^4}{4}.
-   \end{array}
-
-Until here everything is correct, but let's go a little bit further. Notice that the previous formula includes the work done by the traction force and the braking force. It is more accurate, though, to minimise only the work done by the traction force since the train consumes energy from the grid only when :math:`u(t) > 0` but not when :math:`u(t) < 0`. Work is then computed as
-
-.. math::
-
-   \overline{W_{ij}} = \int_{t_i}^{t_j}\max(u(t), 0)v(t)dt = \int_{t_i}^{t_j}u(t)v(t)dt - \int_{t\in\{t_i \leq t \leq t_j | u(t) < 0\}}u(t)v(t)dt
-
-The set :math:`\{t_i \leq t \leq t_j | u(t) < 0\}` is computed as follows:
-
-.. math::
-
-   \begin{array}{rl}
-   u(t) < 0 \Leftrightarrow & m\rho a + C_1 + C_2v^2(t) < 0\\
-   \stackrel{v(t)=a(t-t_i)}{\Leftrightarrow} & m\rho a + C_1 + C_2a^2(t-t_i)^2 < 0\\
-   \Leftrightarrow & (t-t_i)^2 < \frac{-m\rho a - C_1}{a^2C_2}\\
-   \Leftrightarrow & t_i - \sqrt{\frac{-m\rho a - C_1}{a^2C_2}} < t < t_i + \sqrt{\frac{-m\rho a - C_1}{a^2C_2}}\\
-   \end{array}
-
-The last inequality is valid only if :math:`m\rho a + C_1 < 0`. For convenience, let us denote :math:`\tilde{t_i} := t_i - \sqrt{\frac{-m\rho a - C_1}{a^2C_2}}` and :math:`\tilde{t_j} := t_i + \sqrt{\frac{-m\rho a - C_1}{a^2C_2}}`. Finally, the work done only by the traction force is computed as 
-
-.. math::
-
-   \overline{W_{ij}} = 
-   \left\{\begin{array}{rl}
-      \int_{t_i}^{t_j}u(t)v(t)dt,& \text{if } m\rho a + C_1 < 0,\\
-      \int_{t_i}^{t_j}u(t)v(t)dt - \int_{\max(t_i, \tilde{t_i}) = t_i}^{min(t_j, \tilde{t_j})}u(t)v(t)dt,& \text{otherwise.}
-   \end{array}\right.
-
-Regarding the average power of the train, it is computed as:
-
-.. math::
-
-   P_{ij} = \frac{\Delta W_{ij}}{\Delta t},\quad \text{or} \quad \overline{P_{ij}} = \frac{\Delta \overline{W_{ij}}}{\Delta t}

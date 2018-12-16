@@ -34,4 +34,6 @@ The chapter is structured as follows. First, the mathemateical model for the tra
 	
    train_dynamics_models
    speed_profile_optimization_intro
+   speed_profile_optimization_constant_accel
+   speed_profile_optimization_constant_force
    optimal_train_control

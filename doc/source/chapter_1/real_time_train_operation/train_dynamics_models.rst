@@ -8,7 +8,7 @@ Mainly based on [YTYXHG]_ and [WNBS]_.
 There are two main dynamics models depending on the type of train: **single-point control models** and **multi-point control models**. Single-point models offer good results in urban rail transit systems, where running resistances can be neglected with respect to the traction/braking forces. These models are too simple for heavy-haul trains, which consist of a large number of long vehicles carrying a lot of cargo. Multi-point models are more suitable for these types of trains.
 
 Single-point control models
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+```````````````````````````
 
 In single-point control models, a train that consists of more than one vehicle is simplified as a single-point, which means that its dynamics can be modelled with a Newton's equation. Considering the time as the independent variable, the model states as follows:
 
@@ -97,7 +97,7 @@ Finally, :math:`f_t(l_t(s), v)` equals zero outside tunnels.
 
 
 Multi-point control models
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+``````````````````````````
 
 In multi-point models, all vehicle's positions, velocities and accelerations are taken into account. In addition, couplers between vehicles are modelled as linear springs. Basically, multi-point control models are a natural extension of single-point models, which means that they contain the same Newton's equations, but now with additional terms regarding train interactions during traction and braking periods. The following figure shows the key concepts of these types of models.
 
