@@ -77,7 +77,7 @@ The set :math:`\{t_i \leq t \leq t_j | u(t) < 0\}` is computed as follows:
    \stackrel{\text{reorganise}}\Leftrightarrow & (m\rho a + C_1 + C_2av_i^2) + 2v_iC_2a^2(t-t_i) + C_2a^3(t-t_i)^2 < 0\\
    \end{array}
 
-Let us refactor the last expression with :math:`\tilde{a} = m\rho a + C_1 + C_2av_i^2`, :math:`\tilde{b} = 2v_iC_2a^2` and :math:`\tilde{c} = C_2a^3`. Then , the last inequality is equivalent to:
+Let us refactor the last expression with :math:`\tilde{a} = m\rho a + C_1 + C_2av_i^2`, :math:`\tilde{b} = 2v_iC_2a^2` and :math:`\tilde{c} = C_2a^3`. The last inequality is equivalent to:
 
 .. math::
 
@@ -102,14 +102,14 @@ Such inequalities are valid only if the square root can be computed. For conveni
 
    \overline{W_{ij}} = 
    \left\{\begin{array}{rl}
-      \int_{t_i}^{t_j}u(t)v(t)dt,& \text{if } \frac{\tilde{b}^2 - 4\tilde{a}\tilde{c}}{2\tilde{a}} < 0,\\
-      \int_{t_i}^{t_j}u(t)v(t)dt - \int_{t_i}^{\min\{\overline{t}, t_j\}}u(t)v(t)dt,& \text{if } \frac{\tilde{b}^2 - 4\tilde{a}\tilde{c}}{2\tilde{a}} > 0,\\
-      C_1, & \text{if } \frac{\tilde{b}^2 - 4\tilde{a}\tilde{c}}{2\tilde{a}} = 0 \text{ and } C_1 \geq 0,\\
+      \int_{t_i}^{t_j}u(t)v(t)dt,& \text{if } a\neq 0, \frac{\tilde{b}^2 - 4\tilde{a}\tilde{c}}{2\tilde{a}} < 0,\\
+      \int_{\min\{\overline{t}, t_j\}}^{t_j}u(t)v(t)dt,& \text{if } a\neq 0, \frac{\tilde{b}^2 - 4\tilde{a}\tilde{c}}{2\tilde{a}} > 0,\\
+      C_1, & \text{if } a\neq 0, \frac{\tilde{b}^2 - 4\tilde{a}\tilde{c}}{2\tilde{a}} = 0, C_1 \geq 0,\\
       0, &\text{otherwise}.
    \end{array}\right.
 
-Segment Average power in a segment
-''''''''''''''''''''''''''''''''''
+Segment Average power
+'''''''''''''''''''''
 
 Regarding the average power of the train, it is computed as:
 
