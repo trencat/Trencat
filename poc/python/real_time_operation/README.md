@@ -4,7 +4,7 @@ Proof of concept to generate the optimal speed profile of the train. The goal is
 
 ### Execution in docker container
 
-The real time operation module requires the SCIP optimization solver, available here https://scip.zib.de/index.php#download . Just download the SCIP Optimization Suite source code, version 6.0.0, with name `scipoptsuite-6.0.0.tgz`, into 
+The real time operation module requires the SCIP optimization solver, available here https://scip.zib.de/index.php#download . Just download the SCIP Optimization Suite source code, version `6.0.0`, with name `scipoptsuite-6.0.0.tgz`, into 
 `poc/python/real_time_operation`.
 
 First `cd` to this directory.
@@ -17,8 +17,8 @@ To build a docker image with name `rto`, execute
 
 To run the example in the container, execute
 
-    sudo docker container run rto
+    sudo docker container run --rm rto
 
 To run unittest, you need to override the entry point as follows
 
-    sudo docker container run --entrypoint "python3" rto -m unittest
+    sudo docker container run --rm --entrypoint "python3" rto -m unittest
