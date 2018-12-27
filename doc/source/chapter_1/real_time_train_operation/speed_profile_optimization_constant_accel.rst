@@ -125,7 +125,7 @@ As mentioned earlier, we can compute explicity the traction force in a segment w
 
 .. math::
 
-   u(t) =& m\rho a + C_1 + C_2v^2(t)
+   u(t) = m\rho a + C_1 + C_2v^2(t)
 
 Since :math:`C_2` is non-negative, :math:`u(t)` is a second degree polinomial with a positive quadratic coefficient, it is straightforward to see that
 
