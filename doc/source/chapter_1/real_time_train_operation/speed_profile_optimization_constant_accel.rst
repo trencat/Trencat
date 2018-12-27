@@ -120,21 +120,14 @@ Regarding the average power of the train, it is computed as:
 Maximum traction/braking force in a segment
 '''''''''''''''''''''''''''''''''''''''''''
 
+In section :ref:`speed-profile-optimization` it was shown that while building the graph we need to know if the traction/braking force required to move from one state to the next one exceeds the train's maximum traction/braking force.
 As mentioned earlier, we can compute explicity the traction force in a segment with
 
 .. math::
 
-   \begin{array}{rl}
-   u(t) =& m\rho a + C_1 + C_2v^2(t)\\
-   \stackrel{v(t) = v_i + a(t-t_i)}{=}& m\rho a + C_1 + C_2(v_i + a(t-t_i))^2\\
-   = & m\rho a + C_1 + C_2(v_i^2 + a^2(t-t_i)^2 + 2v_ia(t-t_i).\\
-   \end{array}
+   u(t) =& m\rho a + C_1 + C_2v^2(t)
 
-In section :ref:`speed-profile-optimization` it was shown that while building the graph we need to know if the traction/braking force required to move from one state to the next one exceeds the train's maximum traction/braking force. To compute the maximum traction/braking force of the train we distinguish three cases:
-
-   1. Case :math:`C_2=0`: Therefore :math:`u(t) = m\rho a + C_1` is constant.
-   2. Case :math:`a=0`: Therefore, :math:`u(t) = C_1 + C_2v_i` is contant.
-   3. Case :math:`C_2 \neq 0, a\neq 0`: Since :math:`C_2 ` is non-negative, :math:`u(t)` is a second degree polinomial with a positive quadratic coefficient, it is straightforward to see that
+Since :math:`C_2` is non-negative, :math:`u(t)` is a second degree polinomial with a positive quadratic coefficient, it is straightforward to see that
 
 .. math::
 
