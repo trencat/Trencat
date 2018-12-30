@@ -1,3 +1,5 @@
+.. _speed-profile-optimization-computations-constant-acceleration:
+
 Computing physical magnitudes assuming constant acceleration
 ------------------------------------------------------------
 

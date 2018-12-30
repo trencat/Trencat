@@ -69,7 +69,7 @@ Third, :math:`R_l(s,v)` is a function of both space and velocity, expressed as f
 
    R_l(s,v) = mg\sin(\beta(s)) + f_c(r(s)) + f_t(l_t(s), v),
 
-The first term corresponds to the acceleration/deacceleration in non-zero slope segments. The mass of the train is :math:`m`, the gravitational acceleration is :math:`g` and the slope at position :math:`s` is :math:`beta(s)`. The second term refers to the deacceleration caused by the increase of the friction of the wheels in curves, being :math:`r(s)` the radius of the curve at position :math:`s`. The third term models the deacceleration caused by the air friction inside tunnels, being :math:`l_t(s)` the length of the tunnel at position :math:`s`.
+The first term corresponds to the acceleration/deacceleration in non-zero slope segments. The mass of the train is :math:`m`, the gravitational acceleration is :math:`g` and the slope at position :math:`s` is :math:`\beta(s)`. The second term refers to the deacceleration caused by the increase of the friction of the wheels in curves, being :math:`r(s)` the radius of the curve at position :math:`s`. The third term models the deacceleration caused by the air friction inside tunnels, being :math:`l_t(s)` the length of the tunnel at position :math:`s`.
 
 Terms :math:`f_c(\cdot)` and :math:`f_t(\cdot)` are based on empirical formulas. For instance, [WNBS]_ uses the following expression:
 

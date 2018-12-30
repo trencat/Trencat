@@ -3,7 +3,7 @@
 Optimization model
 ------------------
 
-This section aims to give a rigorous mathematical formulation of the :term:`CRP`\ . Before going through the model, it is strongly recommend reading :ref:`conflict-resolution-problem` to motivate the problem and introduce notation with a simple example.
+This section aims to give a rigorous mathematical formulation of the :term:`CRP`\ . Before going through the model, it is strongly recommended to read :ref:`conflict-resolution-problem` to motivate the problem and introduce notation with a simple example.
 
 Sets and Parameters
 ^^^^^^^^^^^^^^^^^^^

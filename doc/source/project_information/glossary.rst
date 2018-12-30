@@ -46,7 +46,10 @@ Glossary
       Rolling Stock Planning.
 
    RTC
-      Railway Traffic Control
+      Railway Traffic Control.
+
+   SPO
+      Speed Profile Optimization.
    
    SCADA
       Supervisory Control And Data Acquisition.
