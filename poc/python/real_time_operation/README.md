@@ -19,6 +19,10 @@ To run the example in the container, execute
 
     sudo docker container run --rm rto
 
+To create a `csv` file with the profile used to create the charts in the docs, run:
+
+    sudo docker container run --rm -v $PWD:/home rto
+
 To run unittest, you need to override the entry point as follows
 
     sudo docker container run --rm --entrypoint "python3" rto -m unittest

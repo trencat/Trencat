@@ -33,8 +33,7 @@ The chapter is structured as follows. First, the mathemateical model for the tra
    :maxdepth: 1
 	
    train_dynamics_models
-   speed_profile_optimization_intro
-   speed_profile_optimization_constant_accel
-   speed_profile_optimization_constant_force
+   speed_profile_optimization
    optimisation_model
+   speed_profile_optimization_test_case
    optimal_train_control

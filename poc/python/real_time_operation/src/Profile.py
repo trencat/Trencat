@@ -141,8 +141,6 @@ class Profile:
                     if next_v + v < 1e-6:
                         continue
                     dt = 2 * ds / (next_v + v)  # Time difference
-                    if dt > timespan[0] and dt > timespan[1]:
-                        continue
 
                     # Acceleration
                     a = (next_v - v) / dt  # Acceleration
@@ -187,6 +185,8 @@ class Profile:
 
         # Run network flow optimization
         model.optimize()
+
+        # model.printStatistics()
 
         # Generate output
         if model.getStatus() != "optimal" and not model.getSols():

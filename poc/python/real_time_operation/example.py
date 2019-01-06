@@ -38,8 +38,6 @@ if success:
 
     dataframe = profile.export(timestep=0.1)
 
-    print(dataframe)
-
     # dataframe to csv
-    # with open('profile.csv', 'w') as f:
-    #     dataframe.to_csv(f)
+    with open('profile.csv', 'w') as f:
+        dataframe.to_csv(f)
