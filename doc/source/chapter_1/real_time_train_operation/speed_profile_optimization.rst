@@ -215,7 +215,15 @@ Since :math:`C_2` is non-negative, :math:`u(t)` is a second degree polinomial wi
 Jerk rate
 .........
 
-The jerk rate is highly related with passenger's discomfort. The higher the rate, the higher the discomfort. The authors [WNBS]_ propose measuring the jerk rate in a segment :math:`[s_i, s_j]` as the sum of the change rate of the traction/braking force in absolute value ove the segment:
+The jerk rate is highly related with passenger's discomfort. The higher the rate, the higher the discomfort. Usually it is defined as
+
+.. math::
+
+   J_{ij} := \int_{t_i}^{t_j} \left|\frac{d a(t)}{dt} \right|,
+
+which is measured in :math:`\left[\frac{m}{s^3}\right]`. In our case, we assumed that the acceleration in a time interval :math:`[t_i,t_j]` is constant, which means that the jerk rate is zero.
+
+In constrast, the authors [WNBS]_ propose measuring the jerk rate in a segment :math:`[s_i, s_j]` as the sum of the change rate of the traction/braking force in absolute value ove the segment:
 
 .. math::
 
@@ -226,7 +234,7 @@ The jerk rate is highly related with passenger's discomfort. The higher the rate
    \stackrel{\frac{dv(t)}{dt} = a}{=}& \int_{t_i}^{t_j} \left|2C_2v(t)a\right|dt\\
    \stackrel{C_2 \geq 0}{=}& 2C_2|a|\int_{t_i}^{t_j} \left|v(t)\right|dt\\
    \stackrel{v(t) \geq 0}{=}& 2C_2|a|\int_{t_i}^{t_j} v(t)dt\\
-   =& 2C_2|a|\Delta s = 2C_2|a|(s_j - s_i)\\
+   =& 2C_2|a|\Delta s = 2C_2|a|(s_j - s_i).\\
    \end{array}
 
-To compute the jerk rate we recall that we assumed constant acceleration, we know the coefficient :math:`C_2` is always non-negative and that the integral of velocity over the period time :math:`[t_i, t_j]` is precisely the displacement of the train in this segment.
+The jerk rate in this second definition is measured in :math:`\left[\frac{N}{s}\right]`. To compute the jerk rate we recall that we assumed constant acceleration, we know the coefficient :math:`C_2` is always non-negative and that the integral of velocity over the period time :math:`[t_i, t_j]` is precisely the displacement of the train in this segment.

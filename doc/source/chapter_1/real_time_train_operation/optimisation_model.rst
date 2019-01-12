@@ -31,10 +31,16 @@ Track parameters:
 
    - :math:`\underline{v_i}, \overline{v_i}`: Minimum and maximum velocities [m/s] of segment :math:`[s_i, s_{i+1})`, for :math:`i\in \{0,\dots, n-1\}`.
 
-   - :math:`V_i`: Finite discrete set of velocities [m/s] that the train can achieve at position :math:`s_i`. :math:`V_0 = \{v_{start}\}`, :math:`V_n = \{v_{end}\}` and :math:`V_i=\{v_i^0, v_i^1, \dots, v_i^{m_i}\}` for :math:`i\in\{1, 2, \dots, n-1\}`, where 
+   - :math:`V_i`: Finite discrete set of velocities [m/s] that the train can achieve at position :math:`s_i`. :math:`V_0 = \{v_{start}\}`, :math:`V_n = \{v_{end}\}` and :math:`V_i=\{v_i^0, v_i^1, \dots, v_i^{m_i}\}` for :math:`i\in\{1, 2, \dots, n-1\}`. More precisely,
 
       .. math::
-         \underline{v_i} = v_i^0 \lneq v_i^1 \lneq \dots \lneq v_i^{m_i} = \overline{v_i}
+         \underline{v_i} = v_i^0 \lneq v_i^1 \lneq \dots \lneq v_i^{m_i}, \text{ where}
+
+      .. math::
+         v_i^{m_i} = \left\{\begin{array}{rl}
+         \overline{v_i} & \text{if } \overline{v_{i+1}} \gneq \overline{v_i},\\
+         \overline{v_i} & \text{otherwise}.\\
+         \end{array}\right.
 
    - :math:`\beta_i`: Slope [radians] of segment :math:`[s_i, s_{i+1})`, for :math:`i\in \{0,\dots, n-1\}`.
    - :math:`r_i`: Bend radius [m] of segment :math:`[s_i, s_{i+1})`, for :math:`i\in \{0,\dots, n-1\}`.
@@ -98,13 +104,15 @@ Constraints
       .. math::
          T_{min}\leq\sum_{i=0}^{n-1} \sum_{e_i^{jk}\in E_i}t_i^{jk}x_i^{jk} \leq T_{max}
 
-   - **Feasibility constraint:** If the train cannot drive from v_i^j to v_{i+1}^k due to physical limitations (for example, the traction force needed exceeds the maximum traction force), then the corresponding variable is fixed to zero.
+   - **Feasibility constraint:** If the train cannot drive from :math:`v_i^j` to :math:`v_{i+1}^k` due to physical limitations (for example, the traction force needed exceeds the maximum traction force), then the corresponding variable is fixed to zero.
 
       .. math::
          x_i^{jk} = 0 \text{ if the train cannot physically reach } v_{i+1}^k \text{ from } v_i^k,\ \forall i\in\{0,1, \dots, n-1\}, \forall e_i^{jk}\in E_i.
 
       .. note::
          For better performance, it is recomended to not create the variable and the edge while building the graph and the optimization model.
+
+   - **Velocity constraint**: The train velocity cannot exceed
 
 
 In all, we obtain a Mixed Integer Linear Programming Problem.

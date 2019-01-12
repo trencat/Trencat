@@ -159,14 +159,16 @@ As expected, the running time in *Case 2* is lower than in *Case 1*. The followi
    
    Optimal speed profile comparison of cases 1 and 2.
 
-The train in *Case 1* runs smoother (and slower) than in *Case 2*. Consequently, the acceleration profile in *Case 1* is also smoother.
+The train in *Case 1* runs smoother (and slower) than in *Case 2*. Consequently, the acceleration profile in *Case 1* is also smoother. Due to the assumption of constant acceleration, the optimal acceleration profile is stepwise.
 
 .. figure:: /_static/speed_profile_poc_acceleration.jpg
    :alt: Optimal acceleration profile comparison.
    
    Optimal acceleration profile comparison of cases 1 and 2.
 
-The next figure shows the optimal force profile of both cases. Notice that in *Case 2* the train almost reaches the maximum braking force, whereas in *Case 1* the braking force is fare from the limit.
+Recall from :ref:`speed-profile-optimization` that the jerk rate at each segment is zero. However, passangers will experience quite a bumpy ride with this abrupt changes in acceleration. In fact, to measure the jerk rate we sould sum all the *steps* at the beginning and end of each segment.
+
+As a consequence of the stepwise nature of the acceleration the optimal force profile will also be highly discontinuous. The next figure shows the optimal force profile of both cases. Notice that in *Case 2* the train almost reaches the maximum braking force, whereas in *Case 1* the braking force is fare from the limit.
 
 .. figure:: /_static/speed_profile_poc_force.jpg
    :alt: Optimal force profile comparison of cases 1 and 2.
@@ -179,6 +181,16 @@ The last figure shows the work done by the traction and braking force. As expect
    :alt: Optimal work profile comparison of cases 1 and 2.
    
    Optimal work profile comparison of cases 1 and 2.
+
+
+Discussion about the quality of the solution
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In short, the stepwise nature of the acceleration and force profiles are not feasible in practice. Trains are not able to react that fast and to increase/decrease the traction force all of a sudden. In future research, it would be interesting to compute the same results but assuming a constant traction force at each segment instead of constant acceleration.
+
+.. note::
+
+   Would you like to contribute with a new model? `Join us! <https://github.com/Joptim/Trencat/blob/master/CONTRIBUTING.md>`_
 
 
 Reproduce results
