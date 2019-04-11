@@ -1,4 +1,4 @@
-.. _speed-profile-optimization:
+.. _speed-profile-optimization-intro:
 
 Speed profile optimization
 --------------------------
