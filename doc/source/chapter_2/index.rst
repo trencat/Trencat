@@ -12,133 +12,111 @@ This chapter gives an insight of the internal structure of the simulator. It int
 Modules overview
 ****************
 
-*TRENCAT* is a simulator platform prepared for any student who wants to put into practice his/her own research in Train Automation Technologies. This assumption have an impact on software design. As a consequence, the software is divided in modules, each one with a specific task to carry out. Such modules are classified in a tight hierarchical structure according to their contribution, as shown in the following figure.
+*TRENCAT* is a simulator platform to carry out custom research in Train Automation Technologies. The software is divided in modules carrying out unique tasks. Such modules can then be substituted by custom modules with personal research. Thanks to task modularity, custom modules can be developed with virtually any programming language. Modules are classified in a tight hierarchical structure according to their objective, as shown in the following figure.
 
 .. figure:: /_static/simulator_hierarchical_structure.jpg
    :alt: Simulator hierarchical structure.
    
    Simulator hierarchical structure.
 
-Modules in the *real time* layer work 24/7 with real time generated data. Modules in the *near real time* layer are run periodically (for example, every hour) or on demand and operate with almost real time and historical data (for example, data from the last X hours until now).
+Modules in the *real time* layer work 24/7 with real time generated data. They are high demanding modules and may run in different computers. Modules in the *near real time* layer are run periodically (for example, every hour) or on demand and operate with almost real time data and historical data (for example, data from the last 10 hours).
 
-High demanding modules, namely modules in the *real time* layer, run in different computers, whereas not-so-high-demanding modules, namely those in the *near real time* layer, may either run in the same computer or different computers. This design facilitates user custom module integration, as seen in section <X>.
-
-Modules share data by communing (love this lemma!). Communication constantly flows *upwards* and *downwards* as depicted next.
+Modules share data by communicating (love this lemma!). The next figure depicts briefly the communication flow between modules.
    
-.. figure:: /_static/simulator_modules_upwards_communications.jpg
+.. figure:: /_static/simulator_modules_communications.jpg
    :alt: Upward communication between modules.
    
-   Upward communication between modules.
+   Communication between modules.
    
-.. figure:: /_static/simulator_modules_downwards_communications.jpg
-   :alt: Downward communication between modules.
-   
-   Downward communication between modules.
-
-There are many things going on here. Let's introduce them step by step.
+In the following sections de modules and communications are described in detail.
 
 ***************
 Modules details
 ***************
 
-   
-Automatic Train Supervision modules and Train 
-=============================================
+.. _designing_railway_simulator_ato:
 
-A Train module simulates a real train. This Train, however, will never move unless someone drives it. The :term:`ATS` module is in charge of driving a Train between two points within safety limits. The next figure depicts the interaction between the :term:`ATS` and the Train.
-   
-.. figure:: /_static/ato_to_train.jpg
-   :alt: Communication between :term:`ATO` and Train.
-   
-   Communication between :term:`ATO` and Train.
-
-The :term:`ATS` establishes a high frequency closed loop feedback with the Train: it requests current driving information and responds with a decision such as *accelerate* or *break*.
-
-A Train stores and makes accessible all the necessary data that is needed to drive it:
-
-   - **Train static information:** mass, number of units that it consists of, length, maximum acceleration/brake rates, etc.
-   - **Dynamic information**:
-  
-      - **Train operation:** self position, velocity and acceleration.
-      - **Infrastructure:** scheduled travel time between two stations, distance to the next station, maximum velocity at each segment, distance to the next semaphore and its current signal, track slope, curve bend radius, distance to the next tunnel (and its length), etc.	 
-      - **Ecosystem**: Any data of interest such as other trains positions, velocities and accelerations.
-	  
-When the train is in motion, the :term:`ATS` requests detailed data to the Train. With all this information, it must decide whether the train must accelerate, coast, break or trigger the emergency break. Once decided, the :term:`ATS` sends a setpoint to the Train, which will perform the requested action if its feasible. The Train will then update the internal data, which will be requested again by the :term:`ATS` to decide next setpoint. And so on.
-
-Additionally, the Train integrates :term:`ATP` (Automatic Train Protection), a safety layer which will take over control in some specific bad scenarios such as breaking safety boundaries (red signal overrun, maximum speed exceeding, etc), loosing connection with :term:`ATS` or :term:`ATS` shutdown requested from higher priority modules.
-
-Finally, the Train got safely to a station and stopped. Now the :term:`ATS` waits until Train confirmation. Meanwhile, the Train will communicate with the Train Manager to update the number of passengers that get on and off the train, and send some collected statistics to the Train Manager.
-
-In future releases the train may implement other modules which may be accessible via requests to the Train process.
-
-.. note::
-	The :term:`ATS` module will run in its own process and users are free to implement their own :term:`ATS` in any programming language as long as it sticks with the protocol. Users are encouraged to use *TRENCAT* as a platform to test their :term:`ATS` implementations and see how such implementations react to many different simulated scenarios. By default, *TRENCAT* implements an :term:`ATS` based on chapter :ref:`speed-profile-optimization`.
-
-
-	
-Train and The Train Manager
+Automatic Train Operation
 ===========================
 
-The Train Manager is a key process in the *TRENCAT* infrastructure as it controls and orchestrates the entire ecosystem.
+The objective of the :term:`ATO` module is to drive the train between two points in safety conditions. To perform this task, the following information is needed:
 
-   - It receives information in real time of each train: position, velocity, acceleration, statuses (stopped, running, how much people each train is carrying, etc).
-   - It monitors the status and events of each station, for example, how many people are there in the platforms.
-   - It monitors the schedule of all trains from the :term:`RTC` and detects when a train is delayed or being delayed. When necessary, it balances the network by requesting new reschedules and rolling stock updates to the :term:`RTC` and :term:`RSP` and propagates the response to all trains.
-   - It determines how many passengers step in and out of a train at each station according to the decisions taken by the Demand Module.
+   - **Static information**:
+      - **Train static information**: mass, length, maximum traction force, maximum braking force and train-specific coefficients.
+      - **Railway infrastructure**: distance between origin and destinations, maximum velocity at each segment, segment slopes, segment bend radii, existence of tunnels (and their lengths) between origin and destination, specific track related coefficients, location of semaphores.
+   - **Dynamic information**:
+      - **Current driving state**: Train position, velocity and acceleration. Updated train mass taking into account the number of passengers.
+      - **Currant railway state**: Status of the following semaphores. It may also use the position, velocity and acceleration of (former) nearby trains.
+      - **Schedule**: Scheduled time between origin and destination.
+      - **Alerts** broadcasted by the Control Centre.
+
+With these information the :term:`ATO` computes a *driving curve plan* between the two points as explained in :ref:`real-time-train-operation`. Next, the :term:`ATO` establishes a high frequency closed loop feedback with the onboard :ref:`designing_railway_simulator_train` computer.
+
+   1.  It reads/requests current driving information.
+   2.  It responds with a setpoint to follow. Such setpoint indicates the traction force to be done by the engine or the braking force to be applied to the brakes.
+
+During the trip, if the train deviates significantly from the *driving curve plan*, a new *plan* is quickly computed on the fly.
+
+The :term:`ATO` should implement security measures (:term:`ATP`) such as:
+
+   1.  If the train overruns a semaphore red signal, trigger the emergency brakes and stop the train completely.
+   2.  Do not allow the train to exceed the segment speed limits. However, if it does exceed it, trigger the service brakes to reduce velocity.
+   3.  If there is a train at close distance (up to a certain threshold depending on current velocity), trigger the emergency brakes and stop the train completely.
+   4.  If the train deviates significantly from the *driving curve plan* and the computation *on the fly* of a new one is taking more time than expected, trigger the service brake and stop the train. Once the train has stopped, compute a new *driving curve* from the current position and continue the trip.
+
+.. _designing_railway_simulator_train:
+
+Train
+=====
+
+The train module simulates the train onboard computer.
+
+   - It stores and provides all the data that :ref:`designing_railway_simulator_ato` needs to perform its calculations.
+   - It receives the setpoints from :ref:`designing_railway_simulator_ato` and applies them, if possible, i.e. it sends the setpoints to the engine.
+   - A builtin :term:`ATP` module takes care of safety and will take over control in the following situations:
+    
+      1.  If the train overruns a semaphore red signal, trigger the emergency brakes and stop the train completely.
+      2.  If the train exceeds the segment speed limits, trigger the emergency brajes and stop the train completely.
+      3.  If there is a train at close distance (up to a certain threshold depending on current velocity), trigger the emergency brakes and stop the train completely.
+      4.  If no feedback has been received from the :ref:`designing_railway_simulator_ato` within a certain amount of milliseconds, trigger the emergency brakes and stop the train completely.
+      5.  If the train cannot update dynamic infrastructure information within a certain amount of seconds, trigger the emergency brakes and stop the train completely.
+   - During idle periods, it computes statistics and :term:`KPI`\s, compresses data, sends it to a database.
+   - The train also sends heartbeat signals to the Control Centre to check if the connection is still alive. The Control Centre will broadcast an alert to all trains if any train looses connection with it.
+
+.. _designing_railway_simulator_control_centre:
+
+Control Centre
+==============
+
+The :ref:`designing_railway_simulator_control_centre` is the core of the simulator. It controls and orchestrates the entire ecosystem.
+
+   - It receives real time information from all trains: train positions, velocities, accelerations, statuses (either if the train is stopped, running, etc) and any other data of interest (how much people each train is carrying, etc).
    - It controls railway infrastructure according to real time information by setting semaphore signals.
-   - It detects train collisions. In case a collision occurs, the Train Manager modifies railway semaphore signals to prevent more collisions. It also notifies other trains about the incident.
+   - It detects train collisions. In case a collision occurs, the Control Centre sets railway semaphore signals to prevent more collisions. It also broadcasts alerts to other trains warning about the incident.
+   - It monitors the schedule of all trains from the :ref:`designing_railway_simulator_rtc_rsp` and detects when a train is delayed or being delayed. When necessary, it balances the network by requesting new reschedules and rolling stock updates to the :ref:`designing_railway_simulator_rtc_rsp`.
+   - It boots up and shuts down new trains remotely according to the :term:`RSP`.
+   - It coordinates the status of each platform, for example, how many people are there in the platforms, how many of them step in and out of the train according to the :ref:`designing_railway_simulator_demand`, etc.
+   - It performs the actions set by the user via :ref:`designing_railway_simulator_scada`.
+   - It computes statistics and :term:`KPI`\s, compresses data, and sends it to a database.
 
-Finally, the Train Manager stores periodically historical data in a database for later use and future analysis.
-   
-Next figures depict the communications that take place between each Train and the Train Manager.
+.. _designing_railway_simulator_rtc_rsp:
 
-.. figure:: /_static/train_to_train_manager.jpg
-   :alt: Communication from the Train to the Train Manager.
-   
-   Communication from the Train to the Train Manager.
+Railway Traffic Control and Rolling Stock Planning
+==================================================
 
-.. figure:: /_static/train_manager_to_train.jpg
-   :alt: Communication from the Train Manager to the Train.
-   
-   Communication from the Train Manager to the Train.
-   
+The :term:`RTC` and :term:`RSP` are in charge of computing train timetables and rolling stock respectively for the next hours according to current and future estimated demand. To do so, they take near real time input data from the database for its calculations. The optimal reschedule and rolling stock are sent back to the Control Centre, which works to accomplish the new orders.
 
-Demand Module and Train Manager
-===============================
 
-The Demand Manager simulates the demand of people in a railway system. In practice, it introduces new people into train stations together with the root that each one must follow in real time. Sophisticated Demand Managers may require infrastructure information to decide people's routing and current real time information to model advanced scenarios. For instance, in a metro railway system, when some trains halt due to another train break down people may decide reroute their trip, which may increase passengers demand in other lines and stations. The next figure depicts the communications between the Demand Manager and the Train Manager.
+.. _designing_railway_simulator_demand:
 
-.. figure:: /_static/demand_manager_to_train.jpg
-   :alt: Communication between the Demand Manager and the Train Manager.
-   
-   Communication between the Demand Manager and the Train Manager.
+Demand module
+=============
 
-.. note::
-	The Demand Manager will run in its own process and users are free to implement their own manager in any programming language as long as it sticks with the protocol. Users are encouraged to use *TRENCAT* as a platform to test their Demand Manager implementations and see how such implementations react to many different simulated scenarios. Currently *TRENCAT* has not started designing this manager yet.
+The :ref:`designing_railway_simulator_demand` simulates the demand of people in a railway system and serves as a tool to test automatic infrastructure demand response. In practice, it introduces new people into train stations together with the root that each one must follow in real time. Sophisticated Demand Managers may require infrastructure information to decide people’s routing and current real time information to model advanced scenarios. For instance, in a metro railway system, when some trains halt due to another train break down people may decide reroute their trip, which may increase passengers demand in other lines and stations.
 
-   
-Railway Traffic Control, Rolling Stock Planning and :term:`SCADA`
-=================================================================
+.. _designing_railway_simulator_scada:
 
-The :term:`RTC` and :term:`RSP` are in charge of computing train timetables and rolling stock respectively for the next hours according to current and future estimated demand. To do so, they take near real time input data from the database for its calculations. The optimal reschedule and rolling stock are sent back to the Train Manager, which works to accomplish the new orders. In addition, the Train Manager stores the new orders in the historical database for later use and future analysis.
+SCADA
+=====
 
-In parallel, the :term:`SCADA` is responsible for displaying real time data (from the Train Manager) and historical data (from the database) in a nice user interface. The :term:`SCADA` allows to...
-   - Monitor the entire infrastructure, showing information reported by trains, the train manager, the demand manager, the :term:`RTC` and :term:`RSP`.
-   - Control manually the entire infrastructure, allowing to set and monitor any kind of testing scenarios.
-
-Analogously to the :term:`RTC` and :term:`RSP` orders, user actions taken via the :term:`SCADA` interface are communicated to the Train Manager, which works to accomplish the new orders. Additionally, the Train Manager stores the new orders in the historical database for later use and future analysis.
-
-The following two figures briefly depict the communications that take place between the Operaing Control Center, the :term:`SCADA`, the Train Manager and the database.
-
-.. figure:: /_static/train_manager_to_near_real_time.jpg
-   :alt: Communication from the Train Manager to all processes in the near real time layer.
-   
-   Communication from the Train Manager to all processes in the near real time layer.
-   
-.. figure:: /_static/near_real_time_to_train_manager.jpg
-   :alt: Communication from the near real time layer to the Train Manager.
-   
-   Communication from the near real time layer to the Train Manager.
-
-.. note::
-	The :term:`RTC` and :term:`RSP` modules will run in their own processes (either periodically and on-demand) and users are free to implement their modules in any programming language as long as they sticks with the protocol. Users are encouraged to use *TRENCAT* as a platform to test their implementations and see how they react to many different simulated scenarios. By default, *TRENCAT* implements a :term:`RTC` based on chapter :ref:`railway-traffic-control` and a :term:`RSP` based on chapter :ref:`optimal-rolling-stock-planning`.
+The :term:`SCADA` provides the end user with a human interface to monitor, supervise and have full manual control of the entire ecosystem.
