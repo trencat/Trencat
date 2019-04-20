@@ -1,0 +1,24 @@
+version: '3.3'
+services:
+    postgres:
+        build:
+            context: ./modules/postgresql
+            dockerfile: Dockerfile
+        ports:
+            - "5432:5432"
+        volumes:
+            - ${POSTGRES_HOST_DATA}:/var/lib/postgresql/data
+        restart: always
+        environment:
+            - POSTGRES_TRENCAT_USER
+            - POSTGRES_TRENCAT_DB
+    redis:
+        build:
+            context: ./modules/redis
+            dockerfile: Dockerfile
+        ports:
+            - "6379:6379"
+        volumes: # Only if storage is enabled in redis.conf
+            - ${REDIS_HOST_DATA}:/data 
+        restart: always
+

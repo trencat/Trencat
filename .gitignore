@@ -1,0 +1,11 @@
+# Do NOT include scipoptsuite libraries
+scipoptsuite*
+
+# Ignore ./tmp folder
+tmp
+
+# Ignore doc/build folder
+doc/build
+
+# Ignore __pycache__ folders
+__pycache__
