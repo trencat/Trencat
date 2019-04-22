@@ -7,29 +7,15 @@
 Project information
 ###################
 
-Developing stage
-================
-
-Currently *TRENCAT* is implementing proofs of concepts of the state of the art algorithms and the architecture explained in documentation.
-
-Getting Started
-===============
-
-Every proof of concept includes a Dockerfile to run it in a Docker (Linux based) container. All docker images and containers have been created with Docker Client version `19.09.0` and Docker Engine - Community `18.09.0` (API version `1.39`).
-
-*TRENCAT* is available in all platforms supporting Docker.
-
 Official documentation
 ======================
+Documentation is divided into two chapters. The first part gives a concise state-of-the-art introduction to all subjects involved in train automation. The second part describes *TRENCAT*'s main structure and communications in detail.
 
-The documentation that you are reading now introduces *TRENCAT* to interested users. The first part is devoted to give a concise state-of-the-art introduction to all subjects involved in train automation. The second part gives insights about how *TRENCAT* is structured with no specific programming language implementation details.
-	
-Furthermore, each module has its own documentation, covering all language specific implementation details. Such implementation is generated with `Godoc <https://godoc.org/golang.org/x/tools/cmd/godoc>`_ for `Golang <https://golang.org/>`_ implementations and `Sphinx <http://www.sphinx-doc.org/en/master/>`_ for `Python <https://www.python.org/>`_ implementations.
+.. Furthermore, each module has its own documentation, covering all language specific implementation details. Such implementation is generated with `Godoc <https://godoc.org/golang.org/x/tools/cmd/godoc>`_ for `Golang <https://golang.org/>`_ implementations and `Sphinx <http://www.sphinx-doc.org/en/master/>`_ for `Python <https://www.python.org/>`_ implementations.
 
 For developers
 --------------
-
-First change to the documentation directory
+To compile documentation, first change to the documentation directory
 
 .. code-block:: bash
 
@@ -54,13 +40,16 @@ Documentation is compiled in `html` inside `./build/html`. Run the last command 
 
    Documentation uses `MathJax <https://www.mathjax.org/>`_ to render formulas in the web browser. You can compile documentation offline, but to render the formulas in the web browser you will need internet connection. If you want to work totally offline, you can download MathJax files and follow the Sphinx `instructions <https://www.sphinx-doc.org/en/master/usage/extensions/math.html>`_.
 
+
+.. _project_information_identity_manual:
+
+Public image guidelines
+=========================
+Please follow the :download:`official guidelines </_static/brand/identity_manual_en.pdf>` if you are planning to use *TRENCAT* brand publicly.
+
 Contributing
 ============
 There are many ways you can contribute to this project. Developers, scientists, engineers, designers, geeks... Everyone can collaborate in their field of expertise. Please read `CONTRIBUTING.md <https://github.com/Joptim/Trencat/blob/master/CONTRIBUTING.md>`_ to know how can you collaborate, how can you benefit with your contributions and the details on our code of conduct.
-
-Authors
-=======
-This section will be filled in the future.
 
 License
 =======
