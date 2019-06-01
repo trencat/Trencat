@@ -21,4 +21,25 @@ services:
         volumes: # Only if storage is enabled in redis.conf
             - ${REDIS_HOST_DATA}:/data 
         restart: always
+    influx:
+        image: influxdb:1.7-alpine
+        #build:
+        #    context: ./modules/influx
+        #    dockerfile: Dockerfile
+        ports:
+            - "8083:8083"
+            - "8086:8086"
+        volumes:
+            - ${INFLUX_HOST_DATA}:/var/lib/influxdb
+        restart: always
+        environment:
+            - INFLUXDB_DB
+    grafana:
+        image: grafana/grafana:6.2.1
+        ports:
+         - 3000:3000
+        volumes:
+            - ${GRAFANA_HOST_DATA}:/var/lib/grafana
+        restart: always
+        user: "472"
 
