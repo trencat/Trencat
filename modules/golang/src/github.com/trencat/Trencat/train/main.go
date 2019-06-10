@@ -50,7 +50,7 @@ func main() {
 	ATP.Start()
 
 	setpoint, _, _ := ATP.OpenSetpointChannel()
-	sensorsChan, _ := ATP.NewSensorChannel(1, 500)
+	sensorsChan, _ := ATP.NewSensorChannel(1, 1500)
 
 	//Accelerate 5 seconds, cruise 10 seconds, brake 7
 	ticker := time.NewTicker(time.Duration(1000) * time.Millisecond)

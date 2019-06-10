@@ -37,9 +37,23 @@ services:
     grafana:
         image: grafana/grafana:6.2.1
         ports:
-         - 3000:3000
+            - "3000:3000"
         volumes:
             - ${GRAFANA_HOST_DATA}:/var/lib/grafana
         restart: always
         user: "472"
+    logserver:
+        #image: rsyslog/syslog_appliance_alpine
+        build:
+            context: ./modules/logserver
+            dockerfile: Dockerfile
+        ports:
+            - "${LOGSERVER_TCP_PORT}:${LOGSERVER_TCP_PORT}"
+        restart: always
+        volumes:
+            - ${LOGSERVER_DATA}:/var/log/trencat/
+        environment:
+            - LOGSERVER_TCP_PORT
+        tty: true
+        stdin_open: true
 
