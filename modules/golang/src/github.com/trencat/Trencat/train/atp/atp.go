@@ -255,7 +255,7 @@ func (atp *ATP) startSensorChannel(sensChan *sensorsChannel) error {
 	defer atp.lock.comms.sensorsChannels.RUnlock()
 
 	if sensChan.channel == nil || sensChan.stop == nil {
-		fail := fmt.Sprintf("Attempt to start sensor channel %+v. Channels not initialised", &sensChan)
+		fail := fmt.Sprintf("Attempt to start sensorsChannel%+v. Channels not initialised", &sensChan)
 		atp.log.Warning(fail)
 		return errors.New(fail)
 	}
@@ -319,7 +319,7 @@ func (atp *ATP) CloseSensorChannel(ID int) error {
 
 func (atp *ATP) Start() (<-chan struct{}, error) {
 
-	// Quick fix
+	// TODO: Remove. Quick fix for testing purposes.
 	atp.core.SetSensors(core.Sensors{
 		Timestamp: time.Now().UnixNano(),
 		TrackID:   1,

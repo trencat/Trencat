@@ -11,16 +11,21 @@ const gravity float64 = 9.80665
 
 // refresh updates real time data. The setpoint refers to acceleration.
 func (atp *ATP) refresh() error {
-	var new core.Sensors
-	co := &(atp.core)
-	train, _ := co.GetTrain()
-	setpoint := atp.setpoint
-	prev, _ := co.GetSensors()
 
+	atp.lock.setpoint.RLock()
+	setpoint := atp.setpoint
+	atp.lock.setpoint.RUnlock()
+
+	co := &(atp.core)
+	prev, _ := co.GetSensors()
+	train, _ := co.GetTrain()
+	track, _ := co.GetTrack(prev.TrackID)
+
+	var new core.Sensors
 	before := prev.Timestamp
 	now := time.Now().UnixNano()
 	deltaSec := float64(now-before) * 1e-9
-	track, _ := co.GetTrack(prev.TrackID)
+
 	mass := train.Mass + float64(prev.NumPassengers)*70 //Add a bit of mass for each passenger
 
 	new.Velocity = math.Max(0.0, prev.Velocity+deltaSec*prev.Acceleration)

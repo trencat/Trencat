@@ -24,15 +24,15 @@ type Track struct {
 	ID          int
 	NextTrackID int
 	PrevTrackID int
-	Source      int
-	Target      int
 	Length      float64
 	MaxVelocity float64
 	Slope       float64
 	BendRadius  float64
 	Tunnel      bool
-	/*TrafficLightID int
-	PlatformID     int*/
+	// Source         int
+	// Target         int
+	// TrafficLightID int
+	// PlatformID     int
 }
 
 // Sensors contains dynamic data collected by train's sensors.
@@ -84,7 +84,7 @@ type Core struct {
 	//alerts
 }
 
-// New declares and initialises a Core object.
+// New declares and initialises a Core instance.
 func New(log *syslog.Writer) (Core, error) {
 	if log == nil {
 		// Panic?
@@ -119,7 +119,7 @@ func (c *Core) SetTrain(train Train) error {
 	defer c.lock.train.Unlock()
 
 	c.train = train
-	c.log.Info(fmt.Sprintf("Set Train %+v", c.train))
+	c.log.Info(fmt.Sprintf("Set Train%+v", c.train))
 	return nil
 }
 
@@ -157,27 +157,27 @@ func (c *Core) InsertTrack(track Track) error {
 	defer c.lock.tracks.Unlock()
 
 	if c.tracks == nil {
-		fail := fmt.Sprintf("Attempt to insert %+v. Core.tracks is not initialised (nil). ", track)
+		fail := fmt.Sprintf("Attempt to insert Track%+v. Core.tracks is not initialised (nil). ", track)
 		c.log.Warning(fail)
 		return errors.New(fail)
 	}
 
 	if prevTrack, exists := c.tracks[track.PrevTrackID]; exists {
 		if prevTrack.NextTrackID != track.ID {
-			fail := fmt.Sprintf("Attempt to insert %+v. Doesn't match with %+v.", track, prevTrack)
+			fail := fmt.Sprintf("Attempt to insert Track%+v. Doesn't match with existing Track%+v.", track, prevTrack)
 			c.log.Warning(fail)
 			return errors.New(fail)
 		}
 	}
 	if nextTrack, exists := c.tracks[track.NextTrackID]; exists {
 		if nextTrack.PrevTrackID != track.ID {
-			fail := fmt.Sprintf("Attempt to insert %+v. Doesn't match with %+v.", track, nextTrack)
+			fail := fmt.Sprintf("Attempt to insert Track%+v. Doesn't match with existing Track%+v.", track, nextTrack)
 			c.log.Warning(fail)
 			return errors.New(fail)
 		}
 	}
 
-	c.log.Info(fmt.Sprintf("Insert Track %+v", track))
+	c.log.Info(fmt.Sprintf("Insert Track%+v", track))
 	c.tracks[track.ID] = track
 	return nil
 }

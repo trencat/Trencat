@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	syslog, err := syslog.Dial("tcp", "localhost:514",
+	syslog, err := syslog.Dial("tcp", "127.0.0.1:514",
 		syslog.LOG_WARNING|syslog.LOG_LOCAL0, "ATP")
 	if err != nil {
 		log.Fatal(err)
@@ -33,15 +33,15 @@ func main() {
 		ID:          1,
 		NextTrackID: 2,
 		PrevTrackID: 0,
-		Source:      1,
-		Target:      2,
 		Length:      10000,
 		MaxVelocity: 14,
 		Slope:       0,
 		BendRadius:  math.Inf(1),
 		Tunnel:      false,
-		/*TrafficLightId: 1,
-		PlatformId:     0,*/
+		// Source:      1,
+		// Target:      2,
+		// TrafficLightId: 1,
+		// PlatformId:     0,
 	}
 
 	ATP, _ := atp.New(syslog)
