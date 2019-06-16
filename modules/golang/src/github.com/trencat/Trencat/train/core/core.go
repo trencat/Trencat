@@ -22,8 +22,6 @@ type Train struct {
 // Track specifications.
 type Track struct {
 	ID          int
-	NextTrackID int
-	PrevTrackID int
 	Length      float64
 	MaxVelocity float64
 	Slope       float64
@@ -48,6 +46,7 @@ type Sensors struct {
 	TractionPower float64
 	BrakingPower  float64
 	Mass          float64
+	TrackIndex    int //Current track position in core.tracks slice
 	TrackID       int
 	RelPosition   float64 //Relative to the current track
 	Slope         float64
@@ -77,7 +76,7 @@ type locks struct {
 type Core struct {
 	//status
 	train   Train
-	tracks  map[int]Track
+	tracks  []Track
 	sensors Sensors
 	lock    *locks
 	log     *syslog.Writer
@@ -93,19 +92,19 @@ func New(log *syslog.Writer) (Core, error) {
 
 	log.Info("New Core initialised")
 	return Core{
-		tracks: make(map[int]Track),
-		lock:   &locks{},
-		log:    log,
+		lock: &locks{},
+		log:  log,
 	}, nil
 }
 
 // GetTrain returns Train specifications.
 func (c *Core) GetTrain() (Train, error) {
 	c.lock.train.RLock()
-	defer c.lock.train.RUnlock()
+	train := c.train
+	c.lock.train.RUnlock()
 
 	//c.log.Info(fmt.Sprintf("Get Train (ID %d)", c.train.ID))
-	return c.train, nil
+	return train, nil
 }
 
 // SetTrain sets new Train specifications.
@@ -116,99 +115,93 @@ func (c *Core) SetTrain(train Train) error {
 	}*/
 
 	c.lock.train.Lock()
-	defer c.lock.train.Unlock()
-
 	c.train = train
+	c.lock.train.Unlock()
+
 	c.log.Info(fmt.Sprintf("Set Train%+v", c.train))
 	return nil
 }
 
 // GetTrack returns Track specifications by its ID.
-func (c *Core) GetTrack(ID int) (Track, error) {
+func (c *Core) GetTrack(position int) (Track, error) {
 	c.lock.tracks.RLock()
-	defer c.lock.tracks.RUnlock()
 
 	if c.tracks == nil {
-		fail := "Attempt to GetTrack, but Core.tracks is not initialised (nil)"
+		c.lock.tracks.RUnlock()
+		fail := "Attempt to GetTrack. Core.tracks is (nil)"
 		c.log.Warning(fail)
 		return Track{}, errors.New(fail)
 	}
 
-	track, exists := c.tracks[ID]
-	if !exists {
-		fail := fmt.Sprintf("Attempt to get Track %d. ID doesn't exist", ID)
+	if position >= len(c.tracks) || position < 0 {
+		c.lock.tracks.RUnlock()
+		fail := fmt.Sprintf("Attempt to GetTrack. Position %d out of bounds", position)
 		c.log.Warning(fail)
 		return Track{}, errors.New(fail)
 	}
+
+	track := c.tracks[position]
+	c.lock.tracks.RUnlock()
 
 	//c.log.Info(fmt.Sprintf("Get Track (ID %d)", track.ID))
 	return track, nil
 
 }
 
-// InsertTrack sets Track specifications.
-func (c *Core) InsertTrack(track Track) error {
-	/*Validate track
+// AddTracks adds an ordered slice of Track to drive through.
+func (c *Core) AddTracks(tracks ...Track) error {
+	/*Validate tracks
 	if !validated {
 		return errors.New("blablabla")
 	}*/
 
 	c.lock.tracks.Lock()
-	defer c.lock.tracks.Unlock()
+	c.tracks = append(c.tracks, tracks...)
+	c.lock.tracks.Unlock()
 
-	if c.tracks == nil {
-		fail := fmt.Sprintf("Attempt to insert Track%+v. Core.tracks is not initialised (nil). ", track)
-		c.log.Warning(fail)
-		return errors.New(fail)
-	}
-
-	if prevTrack, exists := c.tracks[track.PrevTrackID]; exists {
-		if prevTrack.NextTrackID != track.ID {
-			fail := fmt.Sprintf("Attempt to insert Track%+v. Doesn't match with existing Track%+v.", track, prevTrack)
-			c.log.Warning(fail)
-			return errors.New(fail)
-		}
-	}
-	if nextTrack, exists := c.tracks[track.NextTrackID]; exists {
-		if nextTrack.PrevTrackID != track.ID {
-			fail := fmt.Sprintf("Attempt to insert Track%+v. Doesn't match with existing Track%+v.", track, nextTrack)
-			c.log.Warning(fail)
-			return errors.New(fail)
-		}
-	}
-
-	c.log.Info(fmt.Sprintf("Insert Track%+v", track))
-	c.tracks[track.ID] = track
+	c.log.Info(fmt.Sprintf("Add %+v", tracks))
 	return nil
 }
 
-// DeleteTrack drops Track given its ID.
-func (c *Core) DeleteTrack(ID int) {
+// SetTracks sets an ordered slice of Track to drive through.
+// Existing stored tracks are replaced by new ones
+func (c *Core) SetTracks(tracks ...Track) error {
+	/*Validate tracks
+	if !validated {
+		return errors.New("blablabla")
+	}*/
+
 	c.lock.tracks.Lock()
-	defer c.lock.tracks.RUnlock()
+	c.tracks = tracks
+	c.lock.tracks.Unlock()
 
-	if _, exists := c.tracks[ID]; !exists {
-		fail := fmt.Sprintf("Attempt to delete track %d. ID doesn't exist", ID)
-		c.log.Warning(fail)
-	}
+	c.log.Info(fmt.Sprintf("Set %+v", tracks))
+	return nil
+}
 
-	c.log.Info(fmt.Sprintf("Delete Track (ID %d)", ID))
-	delete(c.tracks, ID)
+// DeleteTracks drops Tracks in memory.
+func (c *Core) DeleteTracks() {
+	c.lock.tracks.Lock()
+	c.tracks = nil
+	c.lock.tracks.Unlock()
+
+	c.log.Info("Delete Tracks")
 }
 
 // GetSensors retrieve current sensors data.
 func (c *Core) GetSensors() (Sensors, error) {
 	c.lock.sensors.RLock()
-	defer c.lock.sensors.RUnlock()
+	sensors := c.sensors
+	c.lock.sensors.RUnlock()
 
-	return c.sensors, nil
+	return sensors, nil
 }
 
 // SetSensors sets new sensor values.
 func (c *Core) SetSensors(sensors Sensors) error {
 	c.lock.sensors.Lock()
-	defer c.lock.sensors.Unlock()
-
 	c.sensors = sensors
+	c.lock.sensors.Unlock()
+
 	return nil
 }

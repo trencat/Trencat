@@ -79,18 +79,24 @@ func (atp *ATP) SetTrain(train core.Train) error {
 }
 
 // GetTrack returns Track specifications by its ID.
-func (atp *ATP) GetTrack(ID int) (core.Track, error) {
-	return atp.core.GetTrack(ID)
+func (atp *ATP) GetTrack(position int) (core.Track, error) {
+	return atp.core.GetTrack(position)
 }
 
-// InsertTrack sets Track specifications.
-func (atp *ATP) InsertTrack(track core.Track) error {
-	return atp.core.InsertTrack(track)
+// AddTracks adds an ordered slice of Track to drive through.
+func (atp *ATP) AddTracks(track ...core.Track) error {
+	return atp.core.AddTracks(track...)
 }
 
-// DeleteTrack drops Track given its ID.
-func (atp *ATP) DeleteTrack(ID int) {
-	atp.core.DeleteTrack(ID)
+// SetTracks sets an ordered slice of Track to drive through.
+// Existing stored tracks are replaced by new ones
+func (atp *ATP) SetTracks(track ...core.Track) error {
+	return atp.core.SetTracks(track...)
+}
+
+// DeleteTracks drops Tracks in memory.
+func (atp *ATP) DeleteTracks() {
+	atp.core.DeleteTracks()
 }
 
 // OpenSetpointChannel creates a channel to deliver setpoints while driving.
@@ -122,7 +128,6 @@ func (atp *ATP) OpenSetpointChannel() (chan<- Setpoint, <-chan struct{}, error) 
 	atp.comms.setpoint.channel = channel
 	atp.comms.setpoint.stopNotification = stopNotification
 	atp.comms.setpoint.stop = stop
-
 	atp.lock.comms.setpoint.Unlock()
 
 	if error := atp.readSetpoints(); error != nil {
@@ -130,11 +135,10 @@ func (atp *ATP) OpenSetpointChannel() (chan<- Setpoint, <-chan struct{}, error) 
 		atp.log.Warning(fail)
 
 		atp.lock.comms.setpoint.Lock()
-		defer atp.lock.comms.setpoint.Unlock()
-
 		atp.comms.setpoint.channel = nil
 		atp.comms.setpoint.stopNotification = nil
 		atp.comms.setpoint.stop = nil
+		atp.lock.comms.setpoint.Unlock()
 		return nil, nil, error
 	}
 
@@ -144,9 +148,9 @@ func (atp *ATP) OpenSetpointChannel() (chan<- Setpoint, <-chan struct{}, error) 
 
 func (atp *ATP) readSetpoints() error {
 	atp.lock.comms.setpoint.RLock()
-	defer atp.lock.comms.setpoint.RUnlock()
 
 	if atp.comms.setpoint.channel == nil || atp.comms.setpoint.stop == nil {
+		atp.lock.comms.setpoint.Unlock()
 		fail := "Attempt to listen to setpoint channel. Channel not initialised"
 		atp.log.Warning(fail)
 		return errors.New(fail)
@@ -173,12 +177,13 @@ func (atp *ATP) readSetpoints() error {
 
 		//Safe cleanup
 		atp.lock.comms.setpoint.Lock()
-		defer atp.lock.comms.setpoint.Unlock()
 		atp.comms.setpoint.channel = nil
 		atp.comms.setpoint.stop = nil
+		atp.lock.comms.setpoint.Unlock()
 		atp.log.Info("Dropped setpoint channel")
 	}()
 
+	atp.lock.comms.setpoint.RUnlock()
 	return nil
 }
 
@@ -186,16 +191,17 @@ func (atp *ATP) readSetpoints() error {
 // It does not close the setpoint channel to prevent the sender from writing on a closed channel (which implies panic!)
 func (atp *ATP) StopSetpointChannel() error {
 	atp.lock.comms.setpoint.Lock()
-	defer atp.lock.comms.setpoint.Unlock()
 
 	if atp.comms.setpoint.stop == nil {
+		atp.lock.comms.setpoint.Unlock()
 		fail := "Attempt to stop setpoint channel. Channel is not open"
 		atp.log.Warning(fail)
 		return errors.New(fail)
 	}
 
-	atp.log.Info("Stopping setpoint channel signal sent")
 	close(atp.comms.setpoint.stop)
+	atp.lock.comms.setpoint.Unlock()
+	atp.log.Info("Stopping setpoint channel signal sent")
 
 	return nil
 }
@@ -252,9 +258,9 @@ func (atp *ATP) startSensorChannel(sensChan *sensorsChannel) error {
 	//TODO: Validate frequency. Should be greater than a certain threshold.
 
 	atp.lock.comms.sensorsChannels.RLock()
-	defer atp.lock.comms.sensorsChannels.RUnlock()
 
 	if sensChan.channel == nil || sensChan.stop == nil {
+		atp.lock.comms.sensorsChannels.RUnlock()
 		fail := fmt.Sprintf("Attempt to start sensorsChannel%+v. Channels not initialised", &sensChan)
 		atp.log.Warning(fail)
 		return errors.New(fail)
@@ -285,20 +291,21 @@ func (atp *ATP) startSensorChannel(sensChan *sensorsChannel) error {
 
 		//Safe cleanup
 		atp.lock.comms.sensorsChannels.Lock()
-		defer atp.lock.comms.sensorsChannels.Unlock()
 		delete(atp.comms.sensorsChannels, sensChan.ID)
+		atp.lock.comms.sensorsChannels.Unlock()
 		atp.log.Info(fmt.Sprintf("Closed sensor channel (ID %d)", sensChan.ID))
 	}(atp, sensChan)
 
+	atp.lock.comms.sensorsChannels.RUnlock()
 	return nil
 }
 
 // CloseSensorChannel closes the RealTime's channel matching the given ID.
 func (atp *ATP) CloseSensorChannel(ID int) error {
 	atp.lock.comms.sensorsChannels.Lock()
-	defer atp.lock.comms.sensorsChannels.Unlock()
 
 	if atp.comms.sensorsChannels == nil {
+		atp.lock.comms.sensorsChannels.Unlock()
 		fail := fmt.Sprintf("Attempt to close sensor channel from real time (ID %d). "+
 			"Core.comms.sensorsChannels is not initialised (nil). ", ID)
 		atp.log.Warning(fail)
@@ -307,16 +314,19 @@ func (atp *ATP) CloseSensorChannel(ID int) error {
 
 	sensChan, exists := atp.comms.sensorsChannels[ID]
 	if !exists {
+		atp.lock.comms.sensorsChannels.Unlock()
 		fail := fmt.Sprintf("Attempt to close sensor channel from real time (ID %d). ID doesn't exist", ID)
 		atp.log.Warning(fail)
 		return errors.New(fail)
 	}
 
-	atp.log.Info(fmt.Sprintf("Closing sensor channel (ID %d) signal sent", ID))
 	close(sensChan.stop)
+	atp.lock.comms.sensorsChannels.Unlock()
+	atp.log.Info(fmt.Sprintf("Closing sensor channel (ID %d) signal sent", ID))
 	return nil
 }
 
+//Start makes the train move.
 func (atp *ATP) Start() (<-chan struct{}, error) {
 
 	// TODO: Remove. Quick fix for testing purposes.

@@ -58,20 +58,17 @@ func TestSetGetTrack(t *testing.T) {
 	}
 
 	f := core.NewFactory()
-	tracks, error := f.GetTrack(5, 500, 5000, true, true, true)
+	tracks, error := f.GetTrack(10, 500, 5000, true, true, true)
 	if error != nil {
 		t.Fatalf("%s", error)
 	}
 
-	for _, track := range tracks {
-		error := co.InsertTrack(track)
-		if error != nil {
-			t.Fatalf("%s", error)
-		}
-	}
+	// Test core.AddTracks
+	co.AddTracks(tracks[0:2]...)
+	co.AddTracks(tracks[2:len(tracks)]...)
 
-	for _, track := range tracks {
-		coreTrack, error := co.GetTrack(track.ID)
+	for i, track := range tracks {
+		coreTrack, error := co.GetTrack(i)
 		if error != nil {
 			t.Fatalf("%s", error)
 		}
@@ -80,31 +77,25 @@ func TestSetGetTrack(t *testing.T) {
 			t.Fatalf("Got Track%+v, expected Track%+v", coreTrack, track)
 		}
 	}
-}
 
-func TestIncorrectTrack(t *testing.T) {
-	co, error := core.New(log)
-	if error != nil {
-		t.Fatalf("%s", error)
-	}
-
-	f := core.NewFactory()
-	tracks, error := f.GetTrack(2, 500, 5000, true, true, true)
-	if error != nil {
-		t.Fatalf("%s", error)
-	}
-
-	// Non matching tracks
-	tracks[0].NextTrackID = tracks[1].ID - 1
-
-	error = co.InsertTrack(tracks[0])
-	if error != nil {
-		t.Fatalf("%s", error)
-	}
-
-	//Should return an error
-	error = co.InsertTrack(tracks[1])
+	// Test core.DeleteTracks
+	co.DeleteTracks()
+	coreTrack, error := co.GetTrack(0)
 	if error == nil {
-		t.Fatal("Got nil error, epected non-nil error")
+		t.Fatalf("Expected nil error. Got non nil error %s, got Track %+v", error, coreTrack)
+	}
+
+	// Test core.SetTracks
+	co.SetTracks(tracks...)
+
+	for i, track := range tracks {
+		coreTrack, error := co.GetTrack(i)
+		if error != nil {
+			t.Fatalf("%s", error)
+		}
+
+		if coreTrack != track {
+			t.Fatalf("Got Track%+v, expected Track%+v", coreTrack, track)
+		}
 	}
 }

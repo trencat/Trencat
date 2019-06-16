@@ -19,7 +19,7 @@ func (atp *ATP) refresh() error {
 	co := &(atp.core)
 	prev, _ := co.GetSensors()
 	train, _ := co.GetTrain()
-	track, _ := co.GetTrack(prev.TrackID)
+	track, _ := co.GetTrack(prev.TrackIndex) // TODO Handle error!
 
 	var new core.Sensors
 	before := prev.Timestamp
@@ -79,9 +79,11 @@ func (atp *ATP) refresh() error {
 	new.RelPosition = prev.RelPosition + 0.5*(prev.Velocity+new.Velocity)
 	if new.RelPosition > track.Length {
 		new.RelPosition = 0
-		nextTrack, _ := co.GetTrack(track.NextTrackID)
+		new.TrackIndex = prev.TrackIndex + 1
+		nextTrack, _ := co.GetTrack(prev.TrackIndex + 1) //TODO: Handle error here
 		new.TrackID = nextTrack.ID
 	} else {
+		new.TrackIndex = prev.TrackIndex
 		new.TrackID = prev.TrackID
 	}
 

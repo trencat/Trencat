@@ -54,16 +54,10 @@ func (f *Factory) GetTrack(number int, minLength float64, maxLength float64,
 
 	railroad := make([]Track, number)
 
-	ID := f.rand.Int()
-	nextID := ID
 	for i := 0; i < number; i++ {
-
-		prevID := ID
-		ID, nextID = nextID, f.rand.Int()
+		ID := f.rand.Int()
 		track := Track{
 			ID:          ID,
-			NextTrackID: nextID,
-			PrevTrackID: prevID,
 			Length:      minLength + (maxLength-minLength)*f.rand.Float64(), // Range [minLength, maxLength]
 			MaxVelocity: 5 + (30-5)*f.rand.Float64(),                        // Range [5, 30]
 			BendRadius:  math.Inf(1),

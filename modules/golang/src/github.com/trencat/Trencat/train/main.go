@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	syslog, err := syslog.Dial("tcp", "127.0.0.1:514",
+	syslog, err := syslog.Dial("udp", "127.0.0.1:515",
 		syslog.LOG_WARNING|syslog.LOG_LOCAL0, "ATP")
 	if err != nil {
 		log.Fatal(err)
@@ -31,8 +31,6 @@ func main() {
 
 	track := core.Track{
 		ID:          1,
-		NextTrackID: 2,
-		PrevTrackID: 0,
 		Length:      10000,
 		MaxVelocity: 14,
 		Slope:       0,
@@ -46,7 +44,7 @@ func main() {
 
 	ATP, _ := atp.New(syslog)
 	ATP.SetTrain(train)
-	ATP.InsertTrack(track)
+	ATP.SetTracks(track)
 	ATP.Start()
 
 	setpoint, _, _ := ATP.OpenSetpointChannel()
@@ -84,5 +82,4 @@ loop:
 	}
 
 	time.Sleep(2 * time.Second)
-
 }
