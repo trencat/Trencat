@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	syslog, err := syslog.Dial("udp", "127.0.0.1:515",
+	syslog, err := syslog.Dial("tcp", "127.0.0.1:514",
 		syslog.LOG_WARNING|syslog.LOG_LOCAL0, "ATP")
 	if err != nil {
 		log.Fatal(err)
@@ -47,39 +47,31 @@ func main() {
 	ATP.SetTracks(track)
 	ATP.Start()
 
+	go func() {
+		sensorsChan, _ := ATP.NewSensorChannel(1, 700)
+		for s := range sensorsChan {
+			syslog.Info(fmt.Sprintf("P:%.7f\tV:%.7f\tA:%.7f\tTf:%.7f\tBf:%.7f\tRes:%.7f\tTime:%f\n", s.Position, s.Velocity, s.Acceleration, s.TractionForce, s.BrakingForce, s.Resistance, float64(s.Timestamp)*1e-9))
+		}
+	}()
+
 	setpoint, _, _ := ATP.OpenSetpointChannel()
-	sensorsChan, _ := ATP.NewSensorChannel(1, 1500)
+	syslog.Info("Starting in 1 seconds")
+	time.Sleep(time.Duration(1) * time.Second)
 
 	//Accelerate 5 seconds, cruise 10 seconds, brake 7
-	ticker := time.NewTicker(time.Duration(1000) * time.Millisecond)
-
-	var count int
-
-loop:
-	for {
-		select {
-		case rt := <-sensorsChan:
-			syslog.Info(fmt.Sprintf("P:%.7f\tV:%.7f\tA:%.7f\tTf:%.7f\tBf:%.7f\tRes:%.7f\tTime:%f\n", rt.Position, rt.Velocity, rt.Acceleration, rt.TractionForce, rt.BrakingForce, rt.Resistance, float64(rt.Timestamp)*1e-9))
-
-		case <-ticker.C:
-			now := time.Now().UnixNano()
-			if count < 5 { //2
-				setpoint <- atp.Setpoint{Value: float64(2), Timestamp: now}
-			} else if count < 15 {
-				setpoint <- atp.Setpoint{Value: float64(0), Timestamp: now}
-			} else if count < 20 {
-				setpoint <- atp.Setpoint{Value: float64(-2), Timestamp: now}
-			} else if count > 23 {
-				ticker.Stop()
-				rt := <-sensorsChan
-				syslog.Info(fmt.Sprintf("P:%.7f\tV:%.7f\tA:%.7f\tTf:%.7f\tBf:%.7f\tRes:%.7f\tTime:%f\n", rt.Position, rt.Velocity, rt.Acceleration, rt.TractionForce, rt.BrakingForce, rt.Resistance, float64(rt.Timestamp)*1e-9))
-				ATP.StopSetpointChannel()
-				ATP.CloseSensorChannel(1)
-				break loop
-			}
-			count++
+	for i := 0; i < 25; i++ {
+		now := time.Now().UnixNano()
+		if i < 5 { //2
+			setpoint <- atp.Setpoint{Value: float64(2), Timestamp: now}
+		} else if i < 15 {
+			setpoint <- atp.Setpoint{Value: float64(0), Timestamp: now}
+		} else if i < 20 {
+			setpoint <- atp.Setpoint{Value: float64(-2), Timestamp: now}
+		} else if i > 21 {
+			ATP.StopSetpointChannel()
+			err = ATP.CloseSensorChannel(1)
+			break
 		}
+		time.Sleep(time.Duration(1) * time.Second)
 	}
-
-	time.Sleep(2 * time.Second)
 }

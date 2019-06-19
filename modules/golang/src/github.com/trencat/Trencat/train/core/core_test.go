@@ -12,17 +12,17 @@ import (
 var log *syslog.Writer
 
 func TestMain(m *testing.M) {
+	// call flag.Parse() here if TestMain uses flags
+
 	// Setup
 	syslog, error := syslog.Dial("tcp", "localhost:514",
-		syslog.LOG_WARNING|syslog.LOG_LOCAL0, "ATP_test")
+		syslog.LOG_WARNING|syslog.LOG_LOCAL0, "coreTest")
 
 	if error != nil {
 		panic(fmt.Sprintf("%s", error))
 	}
 
 	log = syslog
-
-	// call flag.Parse() here if TestMain uses flags
 
 	//Teardown
 	os.Exit(m.Run())

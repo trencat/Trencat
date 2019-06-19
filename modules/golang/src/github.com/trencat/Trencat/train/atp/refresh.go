@@ -11,7 +11,6 @@ const gravity float64 = 9.80665
 
 // refresh updates real time data. The setpoint refers to acceleration.
 func (atp *ATP) refresh() error {
-
 	atp.lock.setpoint.RLock()
 	setpoint := atp.setpoint
 	atp.lock.setpoint.RUnlock()
