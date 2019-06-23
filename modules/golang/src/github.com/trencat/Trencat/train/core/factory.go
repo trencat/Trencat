@@ -1,11 +1,12 @@
 package core
 
 import (
-	"errors"
 	"fmt"
 	"math"
 	"math/rand"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 // Factory provides a way to generate core structs with random (but reasonable) data
@@ -48,8 +49,8 @@ func (f *Factory) GetTrack(number int, minLength float64, maxLength float64,
 	slope bool, bend bool, tunnel bool) ([]Track, error) {
 
 	if number <= 0 {
-		fail := fmt.Sprintf("Attempt to Factory.GetTrack. Parameter %d is negative", number)
-		return nil, errors.New(fail)
+		err := errors.Errorf("Attempt to Factory.GetTrack. Parameter %d is negative", number)
+		return nil, err
 	}
 
 	railroad := make([]Track, number)

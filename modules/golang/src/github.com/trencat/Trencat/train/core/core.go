@@ -1,10 +1,11 @@
 package core
 
 import (
-	"errors"
 	"fmt"
 	"log/syslog"
 	"sync"
+
+	"github.com/pkg/errors"
 )
 
 // Train specifications.
@@ -87,7 +88,9 @@ type Core struct {
 func New(log *syslog.Writer) (Core, error) {
 	if log == nil {
 		// Panic?
-		return Core{}, errors.New("Attempt to declare a new Core. Log not provided (nil)")
+		err := errors.New("Attempt to declare a new Core. Log not provided (nil)")
+		fmt.Printf("%+v", err)
+		return Core{}, err
 	}
 
 	log.Info("New Core initialised")
@@ -128,16 +131,16 @@ func (c *Core) GetTrack(position int) (Track, error) {
 
 	if c.tracks == nil {
 		c.lock.tracks.RUnlock()
-		fail := "Attempt to GetTrack. Core.tracks is (nil)"
-		c.log.Warning(fail)
-		return Track{}, errors.New(fail)
+		err := errors.New("Attempt to GetTrack. Core.tracks is (nil)")
+		c.log.Warning(fmt.Sprintf("%+v", err))
+		return Track{}, err
 	}
 
 	if position >= len(c.tracks) || position < 0 {
 		c.lock.tracks.RUnlock()
-		fail := fmt.Sprintf("Attempt to GetTrack. Position %d out of bounds", position)
-		c.log.Warning(fail)
-		return Track{}, errors.New(fail)
+		err := errors.Errorf("Attempt to GetTrack. Position %d out of bounds", position)
+		c.log.Warning(fmt.Sprintf("%+v", err))
+		return Track{}, err
 	}
 
 	track := c.tracks[position]

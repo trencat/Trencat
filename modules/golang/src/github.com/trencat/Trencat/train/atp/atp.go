@@ -1,12 +1,12 @@
 package atp
 
 import (
-	"errors"
 	"fmt"
 	"log/syslog"
 	"sync"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/trencat/Trencat/train/core"
 )
 
@@ -51,11 +51,10 @@ type ATP struct {
 
 // New declares and initialises an ATP object.
 func New(log *syslog.Writer) (ATP, error) {
-	co, error := core.New(log)
-	if error != nil {
-		fail := fmt.Sprintf("Attempt to declare a new ATP. %s", error)
+	co, err := core.New(log)
+	if err != nil {
 		//panic?
-		return ATP{}, errors.New(fail)
+		return ATP{}, err
 	}
 
 	newATP := ATP{
@@ -108,9 +107,9 @@ func (atp *ATP) OpenSetpointChannel() (chan<- Setpoint, <-chan struct{}, error) 
 
 	if atp.comms.setpoint.channel != nil {
 		atp.lock.comms.setpoint.Unlock()
-		fail := "Attempt to open setpoint channel. Channel is already open"
-		atp.log.Warning(fail)
-		return nil, nil, errors.New(fail)
+		err := errors.New("Attempt to open setpoint channel. Channel is already open")
+		atp.log.Warning(fmt.Sprintf("%+v", err))
+		return nil, nil, err
 	}
 
 	//TODO: Implement canOpen()
@@ -130,16 +129,13 @@ func (atp *ATP) OpenSetpointChannel() (chan<- Setpoint, <-chan struct{}, error) 
 	atp.comms.setpoint.stop = stop
 	atp.lock.comms.setpoint.Unlock()
 
-	if error := atp.readSetpoints(); error != nil {
-		fail := fmt.Sprintf("Attempt to read setpoints from channel. %s", error)
-		atp.log.Warning(fail)
-
+	if err := atp.readSetpoints(); err != nil {
 		atp.lock.comms.setpoint.Lock()
 		atp.comms.setpoint.channel = nil
 		atp.comms.setpoint.stopNotification = nil
 		atp.comms.setpoint.stop = nil
 		atp.lock.comms.setpoint.Unlock()
-		return nil, nil, error
+		return nil, nil, err
 	}
 
 	atp.log.Info("Open Setpoint channel")
@@ -151,9 +147,9 @@ func (atp *ATP) readSetpoints() error {
 
 	if atp.comms.setpoint.channel == nil || atp.comms.setpoint.stop == nil {
 		atp.lock.comms.setpoint.Unlock()
-		fail := "Attempt to listen to setpoint channel. Channel not initialised"
-		atp.log.Warning(fail)
-		return errors.New(fail)
+		err := errors.New("Attempt to listen to setpoint channel. Channel not initialised")
+		atp.log.Warning(fmt.Sprintf("%+v", err))
+		return err
 	}
 
 	go func() {
@@ -194,9 +190,9 @@ func (atp *ATP) StopSetpointChannel() error {
 
 	if atp.comms.setpoint.stop == nil {
 		atp.lock.comms.setpoint.Unlock()
-		fail := "Attempt to stop setpoint channel. Channel is not open"
-		atp.log.Warning(fail)
-		return errors.New(fail)
+		err := errors.New("Attempt to stop setpoint channel. Channel is not open")
+		atp.log.Warning(fmt.Sprintf("%+v", err))
+		return err
 	}
 
 	close(atp.comms.setpoint.stop)
@@ -213,17 +209,17 @@ func (atp *ATP) NewSensorChannel(ID int, frequency int) (<-chan core.Sensors, er
 
 	if atp.comms.sensorsChannels == nil {
 		atp.lock.comms.sensorsChannels.Unlock()
-		fail := fmt.Sprintf("Attempt to get sensor channel (ID: %d, freq: %dms). "+
+		err := errors.Errorf("Attempt to get sensor channel (ID: %d, freq: %dms). "+
 			"Core.comms.sensorsChannels is not initialised (nil). ", ID, frequency)
-		atp.log.Warning(fail)
-		return nil, errors.New(fail)
+		atp.log.Warning(fmt.Sprintf("%+v", err))
+		return nil, err
 	}
 
 	if _, exists := atp.comms.sensorsChannels[ID]; exists {
 		atp.lock.comms.sensorsChannels.Unlock()
-		fail := fmt.Sprintf("Attempt to get sensor channel (ID: %d, freq: %dms). ID already exists", ID, frequency)
-		atp.log.Warning(fail)
-		return nil, errors.New(fail)
+		err := errors.Errorf("Attempt to get sensor channel (ID: %d, freq: %dms). ID already exists", ID, frequency)
+		atp.log.Warning(fmt.Sprintf("%+v", err))
+		return nil, err
 	}
 
 	channel := make(chan core.Sensors)
@@ -239,15 +235,12 @@ func (atp *ATP) NewSensorChannel(ID int, frequency int) (<-chan core.Sensors, er
 	atp.comms.sensorsChannels[ID] = sensChan
 	atp.lock.comms.sensorsChannels.Unlock()
 
-	if error := atp.startSensorChannel(&sensChan); error != nil {
-		fail := fmt.Sprintf("Attempt to start sensor channel. %s", error)
-		atp.log.Warning(fail)
-
+	if err := atp.startSensorChannel(&sensChan); err != nil {
 		atp.lock.comms.sensorsChannels.Lock()
 		delete(atp.comms.sensorsChannels, ID)
 		atp.lock.comms.sensorsChannels.Unlock()
 
-		return nil, error
+		return nil, err
 	}
 
 	atp.log.Info(fmt.Sprintf("New sensor channel (ID %d, freq %dms)", ID, frequency))
@@ -261,9 +254,9 @@ func (atp *ATP) startSensorChannel(sensChan *sensorsChannel) error {
 
 	if sensChan.channel == nil || sensChan.stop == nil {
 		atp.lock.comms.sensorsChannels.RUnlock()
-		fail := fmt.Sprintf("Attempt to start sensorsChannel%+v. Channels not initialised", &sensChan)
-		atp.log.Warning(fail)
-		return errors.New(fail)
+		err := errors.Errorf("Attempt to start sensorsChannel%+v. Channels not initialised", &sensChan)
+		atp.log.Warning(fmt.Sprintf("%+v", err))
+		return err
 	}
 
 	go func(atp *ATP, sensChan *sensorsChannel) {
@@ -306,18 +299,18 @@ func (atp *ATP) CloseSensorChannel(ID int) error {
 
 	if atp.comms.sensorsChannels == nil {
 		atp.lock.comms.sensorsChannels.Unlock()
-		fail := fmt.Sprintf("Attempt to close sensor channel from real time (ID %d). "+
+		err := errors.Errorf("Attempt to close sensor channel from real time (ID %d). "+
 			"Core.comms.sensorsChannels is not initialised (nil). ", ID)
-		atp.log.Warning(fail)
-		return errors.New(fail)
+		atp.log.Warning(fmt.Sprintf("%+v", err))
+		return err
 	}
 
 	sensChan, exists := atp.comms.sensorsChannels[ID]
 	if !exists {
 		atp.lock.comms.sensorsChannels.Unlock()
-		fail := fmt.Sprintf("Attempt to close sensor channel from real time (ID %d). ID doesn't exist", ID)
-		atp.log.Warning(fail)
-		return errors.New(fail)
+		err := errors.Errorf("Attempt to close sensor channel from real time (ID %d). ID doesn't exist", ID)
+		atp.log.Warning(fmt.Sprintf("%+v", err))
+		return err
 	}
 
 	close(sensChan.stop)

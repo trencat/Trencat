@@ -18,11 +18,11 @@ func TestMain(m *testing.M) {
 	// call flag.Parse() here if TestMain uses flags
 
 	// Setup
-	syslog, error := syslog.Dial("tcp", "localhost:514",
+	syslog, err := syslog.Dial("tcp", "localhost:514",
 		syslog.LOG_WARNING|syslog.LOG_LOCAL0, "coreTest")
 
-	if error != nil {
-		panic(fmt.Sprintf("%s", error))
+	if err != nil {
+		panic(fmt.Sprintf("%s", err))
 	}
 
 	log = syslog
