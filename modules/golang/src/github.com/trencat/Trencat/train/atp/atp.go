@@ -1,3 +1,5 @@
+// Package atp provides a security layer over train movement.
+// It implements interfaces.ATP.
 package atp
 
 import (
@@ -8,17 +10,14 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/trencat/Trencat/train/core"
+	"github.com/trencat/Trencat/train/interfaces"
 )
 
-// Setpoint contains value and timestamp in nanosecods.
-type Setpoint struct {
-	Value     float64
-	Timestamp int64
-}
-
+// communications gathers interfaces.setpoint and
+// interfaces.Sensors channels
 type communications struct {
 	setpoint struct {
-		channel          <-chan Setpoint
+		channel          <-chan interfaces.Setpoint
 		stop             chan struct{}
 		stopNotification chan<- struct{}
 	}
@@ -28,7 +27,7 @@ type communications struct {
 type sensorsChannel struct {
 	ID        int
 	frequency int
-	channel   chan core.Sensors
+	channel   chan interfaces.Sensors
 	stop      chan struct{}
 }
 
@@ -40,69 +39,75 @@ type locks struct {
 	}
 }
 
-// ATP implements Automatic Train Protection
-type ATP struct {
-	core     core.Core
-	setpoint Setpoint
+// Atp implements interfaces.ATP.
+type Atp struct {
+	core     interfaces.Core
+	setpoint interfaces.Setpoint
 	comms    communications
 	lock     *locks
 	log      *syslog.Writer
 }
 
 // New declares and initialises an ATP object.
-func New(log *syslog.Writer) (ATP, error) {
+func New(log *syslog.Writer) (Atp, error) {
 	co, err := core.New(log)
 	if err != nil {
 		//panic?
-		return ATP{}, err
+		return Atp{}, err
 	}
 
-	newATP := ATP{
-		core: co,
-		lock: &locks{},
-		log:  log,
+	newATP := Atp{
+		core:     &co,
+		setpoint: core.Setpoint{Value: 0.0, Time: time.Unix(0, 0)},
+		lock:     &locks{},
+		log:      log,
 	}
 	newATP.comms.sensorsChannels = make(map[int]sensorsChannel)
+
 	log.Info("New ATP initialised")
 	return newATP, nil
 }
 
 // GetTrain returns Train specifications.
-func (atp *ATP) GetTrain() (core.Train, error) {
+func (atp *Atp) GetTrain() (interfaces.Train, error) {
 	return atp.core.GetTrain()
 }
 
 // SetTrain sets new Train specifications.
-func (atp *ATP) SetTrain(train core.Train) error {
+func (atp *Atp) SetTrain(train interfaces.Train) error {
 	return atp.core.SetTrain(train)
 }
 
 // GetTrack returns Track specifications by its ID.
-func (atp *ATP) GetTrack(position int) (core.Track, error) {
+func (atp *Atp) GetTrack(position int) (interfaces.Track, error) {
 	return atp.core.GetTrack(position)
 }
 
-// AddTracks adds an ordered slice of Track to drive through.
-func (atp *ATP) AddTracks(track ...core.Track) error {
-	return atp.core.AddTracks(track...)
-}
-
 // SetTracks sets an ordered slice of Track to drive through.
-// Existing stored tracks are replaced by new ones
-func (atp *ATP) SetTracks(track ...core.Track) error {
+func (atp *Atp) SetTracks(track ...interfaces.Track) error {
 	return atp.core.SetTracks(track...)
 }
 
-// DeleteTracks drops Tracks in memory.
-func (atp *ATP) DeleteTracks() {
-	atp.core.DeleteTracks()
+// SetInitConditions sets initial conditions of the Train(i.e. position,
+// velocity, acceleration, etc.). It must be called before atp.Start method.
+func (atp *Atp) SetInitConditions(conditions interfaces.InitConditions) error {
+	return atp.core.SetInitConditions(conditions)
+}
+
+// getSetpoint returns last setpoint received in setpoint atp.comms.setpoint.channel.
+func (atp *Atp) getSetpoint() interfaces.Setpoint {
+	atp.lock.setpoint.RLock()
+	setpoint := atp.setpoint
+	atp.lock.setpoint.RUnlock()
+
+	return setpoint
 }
 
 // OpenSetpointChannel creates a channel to deliver setpoints while driving.
 // Call StopSetpointChannel to stop reading setpoints and free memory.
 // The ATP can call atp.StopSetpointChannel whenever appropiate.
 // TODO: Document examples
-func (atp *ATP) OpenSetpointChannel() (chan<- Setpoint, <-chan struct{}, error) {
+func (atp *Atp) OpenSetpointChannel() (chan<- interfaces.Setpoint, <-chan struct{}, error) {
 	atp.lock.comms.setpoint.Lock()
 
 	if atp.comms.setpoint.channel != nil {
@@ -120,7 +125,7 @@ func (atp *ATP) OpenSetpointChannel() (chan<- Setpoint, <-chan struct{}, error) 
 	// 	return nil, errors.New(fail)
 	// }
 
-	channel := make(chan Setpoint)
+	channel := make(chan interfaces.Setpoint)
 	stopNotification := make(chan struct{})
 	stop := make(chan struct{})
 
@@ -142,7 +147,8 @@ func (atp *ATP) OpenSetpointChannel() (chan<- Setpoint, <-chan struct{}, error) 
 	return channel, stopNotification, nil
 }
 
-func (atp *ATP) readSetpoints() error {
+// readSetpoints launches a new go routine to listen to atp.comms.setpoint.channel.
+func (atp *Atp) readSetpoints() error {
 	atp.lock.comms.setpoint.RLock()
 
 	if atp.comms.setpoint.channel == nil || atp.comms.setpoint.stop == nil {
@@ -185,7 +191,7 @@ func (atp *ATP) readSetpoints() error {
 
 // StopSetpointChannel stops ATP from reading setpoints and frees resources.
 // It does not close the setpoint channel to prevent the sender from writing on a closed channel (which implies panic!)
-func (atp *ATP) StopSetpointChannel() error {
+func (atp *Atp) StopSetpointChannel() error {
 	atp.lock.comms.setpoint.Lock()
 
 	if atp.comms.setpoint.stop == nil {
@@ -203,7 +209,7 @@ func (atp *ATP) StopSetpointChannel() error {
 }
 
 // NewSensorChannel creates a channel that delivers RealTime sensors data at the given frequency rate.
-func (atp *ATP) NewSensorChannel(ID int, frequency int) (<-chan core.Sensors, error) {
+func (atp *Atp) NewSensorChannel(ID int, frequency int) (<-chan interfaces.Sensors, error) {
 
 	atp.lock.comms.sensorsChannels.Lock()
 
@@ -222,7 +228,7 @@ func (atp *ATP) NewSensorChannel(ID int, frequency int) (<-chan core.Sensors, er
 		return nil, err
 	}
 
-	channel := make(chan core.Sensors)
+	channel := make(chan interfaces.Sensors)
 	stop := make(chan struct{})
 
 	sensChan := sensorsChannel{
@@ -247,7 +253,7 @@ func (atp *ATP) NewSensorChannel(ID int, frequency int) (<-chan core.Sensors, er
 	return channel, nil
 }
 
-func (atp *ATP) startSensorChannel(sensChan *sensorsChannel) error {
+func (atp *Atp) startSensorChannel(sensChan *sensorsChannel) error {
 	//TODO: Validate frequency. Should be greater than a certain threshold.
 
 	atp.lock.comms.sensorsChannels.RLock()
@@ -259,7 +265,7 @@ func (atp *ATP) startSensorChannel(sensChan *sensorsChannel) error {
 		return err
 	}
 
-	go func(atp *ATP, sensChan *sensorsChannel) {
+	go func(atp *Atp, sensChan *sensorsChannel) {
 		ticker := time.NewTicker(time.Duration(sensChan.frequency) * time.Millisecond)
 
 	loop:
@@ -294,7 +300,7 @@ func (atp *ATP) startSensorChannel(sensChan *sensorsChannel) error {
 }
 
 // CloseSensorChannel closes the RealTime's channel matching the given ID.
-func (atp *ATP) CloseSensorChannel(ID int) error {
+func (atp *Atp) CloseSensorChannel(ID int) error {
 	atp.lock.comms.sensorsChannels.Lock()
 
 	if atp.comms.sensorsChannels == nil {
@@ -319,15 +325,10 @@ func (atp *ATP) CloseSensorChannel(ID int) error {
 	return nil
 }
 
-//Start makes the train move.
-func (atp *ATP) Start() (<-chan struct{}, error) {
-
-	// TODO: Remove. Quick fix for testing purposes.
-	atp.core.SetSensors(core.Sensors{
-		Timestamp: time.Now().UnixNano(),
-		TrackID:   1,
-	})
-
+// Start allows train movement. Once this method is called, Train Sensors are
+// frequently updated according to the provided Setpoint.
+// Returns an error if there are no active setpoint channels.
+func (atp *Atp) Start() (<-chan struct{}, error) {
 	ticker := time.NewTicker(time.Duration(200) * time.Millisecond)
 	stop := make(chan struct{})
 
@@ -336,7 +337,9 @@ func (atp *ATP) Start() (<-chan struct{}, error) {
 		for {
 			select {
 			case <-ticker.C:
-				atp.refresh()
+				// Check setpoint.Time is not too old
+				a, _ := atp.core.GetSensors()
+				atp.core.UpdateSensors(atp.getSetpoint(), time.Since(a.When()))
 			case <-stop:
 				ticker.Stop()
 				break loop

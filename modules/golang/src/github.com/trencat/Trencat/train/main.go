@@ -36,21 +36,23 @@ func main() {
 		Slope:       0,
 		BendRadius:  math.Inf(1),
 		Tunnel:      false,
-		// Source:      1,
-		// Target:      2,
-		// TrafficLightId: 1,
-		// PlatformId:     0,
 	}
 
 	ATP, _ := atp.New(syslog)
 	ATP.SetTrain(train)
 	ATP.SetTracks(track)
+	ATP.SetInitConditions(core.Sensors{
+		Time:    time.Now(),
+		TrackID: 1,
+	})
+
 	ATP.Start()
 
 	go func() {
 		sensorsChan, _ := ATP.NewSensorChannel(1, 700)
-		for s := range sensorsChan {
-			syslog.Info(fmt.Sprintf("P:%.7f\tV:%.7f\tA:%.7f\tTf:%.7f\tBf:%.7f\tRes:%.7f\tTime:%f\n", s.Position, s.Velocity, s.Acceleration, s.TractionForce, s.BrakingForce, s.Resistance, float64(s.Timestamp)*1e-9))
+		for sens := range sensorsChan {
+			s := sens.(core.Sensors)
+			syslog.Info(fmt.Sprintf("P:%.7f\tV:%.7f\tA:%.7f\tTf:%.7f\tBf:%.7f\tRes:%.7f\tTime:%f\n", s.Position, s.Velocity, s.Acceleration, s.TractionForce, s.BrakingForce, s.Resistance, float64(s.Time.UnixNano())*1e-9))
 		}
 	}()
 
@@ -60,13 +62,13 @@ func main() {
 
 	//Accelerate 5 seconds, cruise 10 seconds, brake 7
 	for i := 0; i < 25; i++ {
-		now := time.Now().UnixNano()
-		if i < 5 { //2
-			setpoint <- atp.Setpoint{Value: float64(2), Timestamp: now}
+		now := time.Now()
+		if i < 5 {
+			setpoint <- core.Setpoint{Value: 0.5, Time: now}
 		} else if i < 15 {
-			setpoint <- atp.Setpoint{Value: float64(0), Timestamp: now}
+			setpoint <- core.Setpoint{Value: 0.0, Time: now}
 		} else if i < 20 {
-			setpoint <- atp.Setpoint{Value: float64(-2), Timestamp: now}
+			setpoint <- core.Setpoint{Value: -0.5, Time: now}
 		} else if i > 21 {
 			ATP.StopSetpointChannel()
 			err = ATP.CloseSensorChannel(1)

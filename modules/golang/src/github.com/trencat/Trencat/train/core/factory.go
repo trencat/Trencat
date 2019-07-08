@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/trencat/Trencat/train/interfaces"
 )
 
 // Factory provides a way to generate core structs with random (but reasonable) data
@@ -17,21 +18,19 @@ type Factory struct {
 // NewFactory declares and initialises a Factory instance with a random seed
 func NewFactory() Factory {
 	seed := time.Now().UnixNano()
+	return NewFactorySeed(seed)
+}
+
+// NewFactorySeed declares and initialises a Factory instance with a given seed
+func NewFactorySeed(seed int64) Factory {
 	fmt.Printf("Factory seed set to %d", seed)
 	return Factory{
 		rand: rand.New(rand.NewSource(seed)),
 	}
 }
 
-// NewFactorySeed declares and initialises a Factory instance with a given seed
-func NewFactorySeed(seed int64) Factory {
-	return Factory{
-		rand: rand.New(rand.NewSource(seed)),
-	}
-}
-
 // GetTrain generate a Train instance with random specifications
-func (f *Factory) GetTrain() Train {
+func (f *Factory) GetTrain() interfaces.Train {
 	return Train{
 		ID:            f.rand.Int(),
 		Length:        50 + 1e2*f.rand.Float64(),             // Range [50m, 150m]
@@ -46,14 +45,14 @@ func (f *Factory) GetTrain() Train {
 
 // GetTrack generates a slice of consecutive Track instances with random specifications
 func (f *Factory) GetTrack(number int, minLength float64, maxLength float64,
-	slope bool, bend bool, tunnel bool) ([]Track, error) {
+	slope bool, bend bool, tunnel bool) ([]interfaces.Track, error) {
 
 	if number <= 0 {
 		err := errors.Errorf("Attempt to Factory.GetTrack. Parameter %d is negative", number)
 		return nil, err
 	}
 
-	railroad := make([]Track, number)
+	railroad := make([]interfaces.Track, number)
 
 	for i := 0; i < number; i++ {
 		ID := f.rand.Int()

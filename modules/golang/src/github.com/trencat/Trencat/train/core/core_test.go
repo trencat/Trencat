@@ -7,9 +7,11 @@ import (
 	"testing"
 
 	"github.com/trencat/Trencat/train/core"
+	"github.com/trencat/Trencat/train/interfaces"
 )
 
 var log *syslog.Writer
+var co interfaces.Core
 
 func TestMain(m *testing.M) {
 	// call flag.Parse() here if TestMain uses flags
@@ -24,16 +26,18 @@ func TestMain(m *testing.M) {
 
 	log = syslog
 
+	testCore, err := core.New(log)
+	if err != nil {
+		panic(fmt.Sprintf("%s", err))
+	}
+
+	co = &testCore
+
 	//Teardown
 	os.Exit(m.Run())
 }
 
 func TestSetGetTrain(t *testing.T) {
-	co, error := core.New(log)
-	if error != nil {
-		t.Fatalf("%s", error)
-	}
-
 	f := core.NewFactory()
 	for i := 0; i <= 10; i++ {
 		train := f.GetTrain()
@@ -52,37 +56,11 @@ func TestSetGetTrain(t *testing.T) {
 }
 
 func TestSetGetTrack(t *testing.T) {
-	co, error := core.New(log)
-	if error != nil {
-		t.Fatalf("%s", error)
-	}
 
 	f := core.NewFactory()
 	tracks, error := f.GetTrack(10, 500, 5000, true, true, true)
 	if error != nil {
 		t.Fatalf("%s", error)
-	}
-
-	// Test core.AddTracks
-	co.AddTracks(tracks[0:2]...)
-	co.AddTracks(tracks[2:len(tracks)]...)
-
-	for i, track := range tracks {
-		coreTrack, error := co.GetTrack(i)
-		if error != nil {
-			t.Fatalf("%s", error)
-		}
-
-		if coreTrack != track {
-			t.Fatalf("Got Track%+v, expected Track%+v", coreTrack, track)
-		}
-	}
-
-	// Test core.DeleteTracks
-	co.DeleteTracks()
-	coreTrack, error := co.GetTrack(0)
-	if error == nil {
-		t.Fatalf("Expected nil error. Got non nil error %s, got Track %+v", error, coreTrack)
 	}
 
 	// Test core.SetTracks
@@ -98,4 +76,10 @@ func TestSetGetTrack(t *testing.T) {
 			t.Fatalf("Got Track%+v, expected Track%+v", coreTrack, track)
 		}
 	}
+}
+
+//TestUpdateSensorsAcceleration tests UpdateSensors implementation
+//considering that setpoint refers to acceleration.
+func TestUpdateSensorsAcceleration(t *testing.T) {
+	//Create table driven tests
 }

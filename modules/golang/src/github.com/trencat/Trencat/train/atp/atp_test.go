@@ -65,6 +65,11 @@ func TestSimpleDriving(t *testing.T) {
 		t.Fatalf("%s", err)
 	}
 
+	ATP.SetInitConditions(core.Sensors{
+		Time:    time.Now(),
+		TrackID: 1,
+	})
+
 	_, err = ATP.Start()
 
 	if err != nil {
@@ -78,13 +83,13 @@ func TestSimpleDriving(t *testing.T) {
 
 	//Accelerate 5 seconds, cruise 10 seconds, brake 7
 	for i := 0; i < 25; i++ {
-		now := time.Now().UnixNano()
+		now := time.Now()
 		if i < 5 { //2
-			setpoint <- atp.Setpoint{Value: float64(2), Timestamp: now}
+			setpoint <- core.Setpoint{Value: float64(0.5), Time: now}
 		} else if i < 15 {
-			setpoint <- atp.Setpoint{Value: float64(0), Timestamp: now}
+			setpoint <- core.Setpoint{Value: float64(0), Time: now}
 		} else if i < 20 {
-			setpoint <- atp.Setpoint{Value: float64(-2), Timestamp: now}
+			setpoint <- core.Setpoint{Value: float64(-0.5), Time: now}
 		} else if i > 21 {
 			ATP.StopSetpointChannel()
 			break
@@ -103,18 +108,19 @@ func TestSimpleDriving(t *testing.T) {
 		t.Errorf("%s", err)
 	}
 
-	log.Info(fmt.Sprintf("P:%.7f\tV:%.7f\tA:%.7f\tTf:%.7f\tBf:%.7f\tRes:%.7f\tTime:%f\n", sensor.Position, sensor.Velocity, sensor.Acceleration, sensor.TractionForce, sensor.BrakingForce, sensor.Resistance, float64(sensor.Timestamp)*1e-9))
+	s := sensor.(core.Sensors)
+	log.Info(fmt.Sprintf("P:%.7f\tV:%.7f\tA:%.7f\tTf:%.7f\tBf:%.7f\tRes:%.7f\tTime:%f\n", s.Position, s.Velocity, s.Acceleration, s.TractionForce, s.BrakingForce, s.Resistance, float64(s.Time.UnixNano())*1e-9))
 
-	if math.Abs(sensor.Position-150.0) > 5e-1 {
-		t.Errorf("Expect train to stop at position 150.0. Finally stopped at %f", sensor.Position)
+	if math.Abs(s.Position-37.5) > 5e-1 {
+		t.Errorf("Expect train to stop at position at 150.0m. Finally stopped at %fm", s.Position)
 	}
 
-	if math.Abs(sensor.Velocity-0.0) > 1e-1 {
-		t.Errorf("Expect train to have velocity 0.0. Velocity is %f", sensor.Velocity)
+	if math.Abs(s.Velocity-0.0) > 1e-1 {
+		t.Errorf("Expect train velocity 0.0m/s. Velocity is %fm/s", s.Velocity)
 	}
 
-	if math.Abs(sensor.Acceleration-0.0) > 1e-1 {
-		t.Errorf("Expect train to have acceleration 0.0. Acceleration is %f", sensor.Acceleration)
+	if math.Abs(s.Acceleration-0.0) > 1e-1 {
+		t.Errorf("Expect train acceleration 0.0m/s2. Acceleration is %fm/s2", s.Acceleration)
 	}
 
 }
