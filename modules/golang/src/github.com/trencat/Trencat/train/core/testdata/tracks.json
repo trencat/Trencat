@@ -1,0 +1,3 @@
+{
+    "default":[{"ID":1,"Length":100000,"MaxVelocity":10000,"Slope":0,"BendRadius":100000,"Tunnel":false}]
+}

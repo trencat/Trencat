@@ -175,9 +175,7 @@ func (c *Core) SetInitConditions(conditions interfaces.InitConditions) error {
 }
 
 func (c *Core) setInitConditions(conditions Sensors) error {
-	c.lock.tracks.Lock()
 	err := c.setSensors(conditions)
-	c.lock.tracks.Unlock()
 
 	if err == nil {
 		c.log.Info(fmt.Sprintf("Set initial conditions Sensors%+v", conditions))
@@ -371,8 +369,8 @@ func (c *Core) updateSensorsAcceleration(setpoint float64, elapsed time.Duration
 	new.LineRes = new.SlopeRes + new.CurveRes + new.TunnelRes
 	new.Resistance = new.BasicRes + new.LineRes
 	// Acceleration
-	maxAcceleration := train.MaxForce/(new.Mass*train.MassFactor) - new.Resistance
-	maxDeceleration := (-1)*train.MaxBrake/(new.Mass*train.MassFactor) - new.Resistance
+	maxAcceleration := (train.MaxForce - new.Resistance) / (new.Mass * train.MassFactor)
+	maxDeceleration := ((-1)*train.MaxBrake - new.Resistance) / (new.Mass * train.MassFactor)
 	if setpoint > 0.0 && setpoint > maxAcceleration {
 		// Correction required. Accelerating more than allowed
 		c.log.Warning(fmt.Sprintf("Acceleration setpoint %fm/s2 exceeds maximum acceleration %fm/s", setpoint, maxAcceleration))

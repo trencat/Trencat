@@ -1,0 +1,4 @@
+{
+    "SBB Re 460 locomotive":{"ID":1,"Mass":507000,"MassFactor":1.06,"Length":75,"MaxForce":300000,"MaxBrake":447500,"ResistanceLin":2.7613412228796843e-8,"ResistanceQua":5.0571992110453646e-11},
+    "random1":{"ID":2,"Mass":317384.81098212575,"MassFactor":1.1773735684973046,"Length":110.38097967800213,"MaxForce":462098.58679776755,"MaxBrake":573961.9187977917,"ResistanceLin":9.756717029589157e-7,"ResistanceQua":5.778228720800557e-10}
+}

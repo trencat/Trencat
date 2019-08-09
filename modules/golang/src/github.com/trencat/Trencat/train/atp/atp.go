@@ -338,8 +338,8 @@ func (atp *Atp) Start() (<-chan struct{}, error) {
 			select {
 			case <-ticker.C:
 				// Check setpoint.Time is not too old
-				a, _ := atp.core.GetSensors()
-				atp.core.UpdateSensors(atp.getSetpoint(), time.Since(a.When()))
+				sensors, _ := atp.core.GetSensors()
+				atp.core.UpdateSensors(atp.getSetpoint(), time.Since(sensors.When()))
 			case <-stop:
 				ticker.Stop()
 				break loop
