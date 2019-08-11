@@ -1,0 +1,7 @@
+{
+    "trivial_flat":{
+        "TestTrain":"SBB Re 460 locomotive",
+        "TestTrack":"default",
+        "Sensors":{"Time":"2019-07-10T20:00:22.245281838+02:00","Setpoint":0,"Position":0,"Velocity":0,"Acceleration":0,"TractionForce":0,"BrakingForce":0,"TractionPower":0,"BrakingPower":0,"Mass":0,"TrackIndex":0,"TrackID":1,"RelPosition":0,"Slope":0,"BendRadius":0,"Tunnel":false,"Resistance":0,"BasicRes":0,"SlopeRes":0,"CurveRes":0,"TunnelRes":0,"LineRes":0,"NumPassengers":0}
+    }
+}

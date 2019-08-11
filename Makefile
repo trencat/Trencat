@@ -19,9 +19,9 @@ build-train:
 
 .PHONY: test test-update
 test:
-	$(GOTEST) -v github.com/trencat/Trencat/...
+	$(GOTEST) github.com/trencat/Trencat/...
 test-update:
-	$(GOTEST) -v github.com/trencat/Trencat/... --update
+	$(GOTEST) github.com/trencat/Trencat/... --update
 
 .PHONY: run-logserver
 run-logserver:
