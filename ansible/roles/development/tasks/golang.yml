@@ -1,0 +1,28 @@
+ # How to use it
+ # - include_tasks: install_golang.yml
+ #   vars: 
+ #     golang_version: 1.12.4
+ #     golang_system: linux
+ #     golang_arch: amd64
+
+- name: Check golang exists
+  command: go version
+  register: golang_exists
+  ignore_errors: yes
+
+- name: apt curl
+  when: golang_exists is failed
+  become: yes
+  apt:
+    name: curl
+    state: present
+    update_cache: yes
+
+- name: Download golang
+  when: golang_exists is failed
+  command: "curl --silent https://dl.google.com/go/go{{ golang_version }}.{{ golang_system }}-{{ golang_arch }}.tar.gz --output /tmp/go{{ golang_version }}.{{ golang_system }}-{{ golang_arch }}.tar.gz"
+  register: golang_download
+
+- name: Install golang in /usr/local/go
+  when: golang_download is not skipped and golang_download is succeeded
+  command: "tar -C /usr/local -xzf go{{ golang_version }}.{{ golang_system }}-{{ golang_arch }}.tar.gz"

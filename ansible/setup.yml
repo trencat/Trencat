@@ -1,0 +1,5 @@
+- hosts: localhost
+  vars:
+      - install_vscode: true
+  roles:
+      - role: development

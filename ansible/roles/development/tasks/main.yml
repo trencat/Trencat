@@ -1,0 +1,18 @@
+####################
+# INSTALL SOFTWARE #
+####################
+
+- include_tasks: git.yml
+- include_tasks: docker.yml
+- include_tasks: python.yml
+- include_tasks: golang.yml
+- include_tasks: protoc.yml
+- include_tasks: vscode.yml
+  when: install_vscode|bool
+
+
+####################
+# INSTALL TRENCAT  #
+####################
+
+- include_tasks: trencat.yml

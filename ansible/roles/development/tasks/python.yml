@@ -1,0 +1,8 @@
+- name: Install python
+  become: yes
+  apt:
+    name:
+      - "{{ apt_get_python_version }}"
+      - "{{ atp_get_pip_version }}"
+    state: present
+    update_cache: yes

@@ -1,0 +1,22 @@
+---
+# python.yml
+apt_get_python_version: python3.6
+atp_get_pip_version: python3-pip
+
+# golang.yml
+golang_version: 1.12.4
+golang_system: linux
+golang_arch: amd64
+
+# protoc.yml
+protoc_version: 3.10.1
+protoc_system: linux
+protoc_arch: x86_64
+
+# vscode.yml
+install_vscode: false
+
+# trencat.yml
+project_dir: "{{ ansible_env.HOME }}/trencat"
+virtualenv_dir: "{{ project_dir }}/virtualenvs"
+src_dir: "{{ project_dir }}/"

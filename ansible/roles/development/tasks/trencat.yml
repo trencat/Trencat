@@ -1,0 +1,31 @@
+- name: Create trencat project directory
+  file:
+    path: "{{ project_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Set environment variables
+  blockinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    backup: yes
+    state: present
+    block: |
+      export GOPATH="{{ src_dir }}"
+      export PATH="$PATH:{{ src_dir }}/bin"
+      export TRENCAT_VIRTUALENV="{{ virtualenv_dir }}"
+
+- name: Download trencat repos
+  command: "env GOPATH={{ src_dir }} go get -u github.com/trencat/{{ item }}"
+  loop:
+  - workerpool
+  - communications
+  - goutils
+  - train
+
+- name: Download trencat's golang dependencies
+  command: "env GOPATH={{ src_dir }} go get -u {{ item }}"
+  loop:
+  - google.golang.org/grpc
+  - github.com/golang/protobuf/protoc-gen-go
+  - github.com/google/go-cmp/cmp
+  - github.com/docker/docker/client

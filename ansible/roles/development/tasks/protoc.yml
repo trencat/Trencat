@@ -1,0 +1,37 @@
+ # How to use it
+ # - include_tasks: install_protobuf.yml
+ #   vars: 
+ #     protoc_version: 3.10.1
+ #     protoc_system: linux
+ #     protoc_arch: x86_64
+
+- name: Check protoc compiler is installed
+  command: protoc --version
+  register: protoc_exists
+  ignore_errors: yes
+
+- name: apt curl
+  when: protoc_exists is failed
+  become: yes
+  apt:
+    name: curl
+    state: present
+    update_cache: yes
+
+- name: Download protoc compiler
+  when: protoc_exists is failed
+  command: "curl --silent https://github.com/protocolbuffers/protobuf/releases/download/v{{ protoc_version }}/protoc-{{ protoc_version }}-{{ protoc_system }}-{{ protoc_arch }}.zip --output /tmp/protoc-{{ protoc_version }}-{{ protoc_system }}-{{ protoc_arch }}.zip"
+  register: protoc_downloaded
+
+- name: Unzip protoc compiler
+  when: protoc_downloaded is not skipped and protoc_downloaded is succeeded
+  command: "unzip -o -qq /tmp/protoc-{{ protoc_version }}-{{ protoc_system }}-{{ protoc_arch }}.zip -d /tmp/protoc-{{ protoc_version }}-{{ protoc_system }}-{{ protoc_arch }}"
+  register: protoc_unzip
+
+- name: Copy protoc compiler
+  when: protoc_unzip is not skipped and protoc is succeeded
+  command: "cp /tmp/protoc-{{ protoc_version }}-{{ protoc_system }}-{{ protoc_arch }}/bin/* /usr/local/bin/"
+
+- name: Copy protoc includes
+  when: protoc_unzip is not skipped and protoc is succeeded
+  command: "cp /tmp/protoc-{{ protoc_version }}-{{ protoc_system }}-{{ protoc_arch }}/include/* /usr/local/include/"
